@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.3)
+project(ap_ex1)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
+add_subdirectory(lib/googletest-master)
+include_directories(lib/googletest-master/googletest/include)
+include_directories(lib/googletest-master/googlemock/include)
+
+set(SOURCE_FILES main.cpp Grid.cpp Grid.h NodePoint.cpp NodePoint.h Point.cpp Point.h Point2D.cpp Point2D.h TwoDim.cpp TwoDim.h Bfs.cpp Bfs.h InputProcessing.cpp InputProcessing.h Passenger.cpp Passenger.h Trip.cpp Trip.h Tests/Point2DTest.cpp Tests/PassengerTest.cpp CabFactory.cpp CabFactory.h StandardCab.cpp StandardCab.h LuxuryCab.cpp LuxuryCab.h Driver.cpp Driver.h Tests/TwoDimTest.cpp TaxiCenter.cpp TaxiCenter.h Tests/TripTest.cpp Tests/StandardCabTest.cpp Tests/LuxuryCabTest.cpp Tests/DriverTest.cpp Tests/BfsTest.cpp Tests/NodePointTest.cpp Tests/TaxiCenterTest.cpp Tests/InputProcessingTest.cpp)
+add_executable(ap_ex1 ${SOURCE_FILES} Grid.cpp Grid.h NodePoint.cpp NodePoint.h Point.cpp Point.h Point2D.cpp Point2D.h TwoDim.cpp TwoDim.h Bfs.cpp Bfs.h InputProcessing.cpp InputProcessing.h Passenger.cpp Passenger.h Trip.cpp Trip.h Tests/Point2DTest.cpp Tests/PassengerTest.cpp CabFactory.cpp CabFactory.h StandardCab.cpp StandardCab.h LuxuryCab.cpp LuxuryCab.h Driver.cpp Driver.h TaxiCenter.cpp TaxiCenter.h Tests/TripTest.cpp Tests/StandardCabTest.cpp Tests/LuxuryCabTest.cpp Tests/DriverTest.cpp Tests/BfsTest.cpp Tests/NodePointTest.cpp Tests/TaxiCenterTest.cpp Tests/InputProcessingTest.cpp)
+target_link_libraries(ap_ex1 gtest gtest_main)
