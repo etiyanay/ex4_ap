@@ -1,3 +1,21 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/base_object.hpp>
 #ifndef AP_EX1_TRIP_H
 #define AP_EX1_TRIP_H
 
@@ -5,6 +23,11 @@
 #include "Point.h"
 #include "NodePoint.h"
 #include "Passenger.h"
+
+
+using namespace std;
+using namespace boost::archive;
+
 
 /**
  * this class is in charge of the trip object that is given to the drivers
@@ -16,6 +39,20 @@ private:
     double tariff;
     vector <NodePoint*> path;
     vector <Passenger*> currentPassengers;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version)
+    {
+        ar & id;
+        ar & metersPassed;
+        ar & numOfPassengers;
+        ar & startPoint;
+        ar & endPoint;
+        ar & tariff;
+        ar & path;
+        ar & currentPassengers;
+
+    }
 public:
     /**
      * default ctor

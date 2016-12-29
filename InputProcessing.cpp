@@ -83,14 +83,16 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
 
     //serial_str = buffer2;
-    CabFactory *gp2;
+    Trip *gp2;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
     ia >> gp2;
-    cout << "we are printing gp2: "<< gp2->getID()<<endl;
-    cout << "we are tariff gp2: "<< gp2->getTariff()<<endl;
-    cout << "we are tariff gp2: "<< gp2->getColor()<<endl;
+    cout << "we are printing gp2: "<< gp2->getId()<<endl;
+    cout << "we are tariff gp2: "<< gp2->getNumOfPassengers()<<endl;
+    cout << "we are tariff gp2: "<< gp2->getStartPoint()<<endl;
+   // cout << "we are tariff gp2: "<< gp2->getPath().<<endl;
+
 
     cout << "success point" << endl;
     //cout << "server got: " << buffer << endl;

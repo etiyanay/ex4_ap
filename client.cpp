@@ -50,8 +50,10 @@ int main(int argc, char *argv[]) {
 
     udp.reciveData(buffer, sizeof(buffer));
     cout << "client got: " << buffer << endl;
+Point2D* x = new Point2D(2,2);
+    Point2D* y = new Point2D(3,3);
 
-    CabFactory *gp = new StandardCab(1234,FIAT,WHITE);
+    Trip *gp = new Trip(1234,x,y,5,20.5);
     //cout << "the x is: " <<((Point2D*)gp)->getX() << endl;
     std::string serial_str;
     boost::iostreams::back_insert_device<std::string> inserter(serial_str);
