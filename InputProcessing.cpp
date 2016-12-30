@@ -23,6 +23,7 @@
 #include <boost/serialization/export.hpp>
 
 
+
 using namespace std;
 using namespace boost::archive;
 
@@ -77,6 +78,18 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     boost::archive::binary_iarchive ia(s2);
     ia >> newDriver;
     station->addNewDriver(*newDriver);
+
+    CabFactory* matchingCab;
+    matchingCab = station->findCabById(newDriver->getCabId());
+    //serializing
+    string serial_str2;
+    boost::iostreams::back_insert_device<std::string> inserter(serial_str2);
+    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+    boost::archive::binary_oarchive oa(s);
+    oa << matchingCab;
+    s.flush();
+    //sending the serialized cab
+    udp->sendData(serial_str2);
 }
 void insertTrip(TaxiCenter* station) {
     int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip;
@@ -137,7 +150,6 @@ void menu(TaxiCenter* station, Socket* udp) {
             break;
         case 7:
             udp->closeData();
-
             delete station;
             exit(0);
         default:

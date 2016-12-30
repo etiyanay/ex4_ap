@@ -53,5 +53,7 @@ void driverLocationRequest(TaxiCenter* station);
  * @param map the map to update about the obstacles
  */
 void createObstacles(Grid* map);
+string bufferToString(char* buffer, int bufflen);
+
 
 #endif //AP_EX1_INPUTPROCESSING_H
