@@ -1,3 +1,9 @@
+#ifndef AP_EX1_TRIP_H
+#define AP_EX1_TRIP_H
+#include <vector>
+#include "Point.h"
+#include "NodePoint.h"
+#include "Passenger.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -13,17 +19,8 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
-
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/base_object.hpp>
-#ifndef AP_EX1_TRIP_H
-#define AP_EX1_TRIP_H
-
-#include <vector>
-#include "Point.h"
-#include "NodePoint.h"
-#include "Passenger.h"
-
 
 using namespace std;
 using namespace boost::archive;

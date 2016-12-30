@@ -23,8 +23,6 @@
 #include <boost/serialization/export.hpp>
 
 
-
-
 using namespace std;
 using namespace boost::archive;
 
@@ -70,37 +68,15 @@ void createObstacles(Grid* map) {
     }
 }
 void insertDriver(TaxiCenter* station, Socket* udp) {
-    int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
-    char statusOfDriver, dummy;
-    Driver newDriver;
-    cin >> idOfDriver >> dummy >> ageOfDriver >> dummy >> statusOfDriver >> dummy
-        >> experienceOfDriver >> dummy >> idVehicelOfDriver;
-    newDriver = Driver(idOfDriver, ageOfDriver, Marital(statusOfDriver) ,
-                       experienceOfDriver,idVehicelOfDriver);
-    station->addNewDriver(newDriver);
-
-    /*int idVehicelOfDriver;
-    Driver newDriver;
-    char buffer[1024];
-    udp->reciveData(buffer, sizeof(buffer));
-    cout << "we are printing hello: "<< buffer<<endl;
-    udp->sendData("cab");
+    Driver *newDriver;
     char buffer2[1024];
     udp->reciveData(buffer2, sizeof(buffer2));
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
-    Trip *gp2;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
-    ia >> gp2;
-    cout << "we are printing gp2: "<< gp2->getId()<<endl;
-    cout << "we are tariff gp2: "<< gp2->getNumOfPassengers()<<endl;
-    cout << "we are tariff gp2: "<< gp2->getStartPoint()<<endl;
-   cout << "we are tariff gp2: "<< gp2->getPath()[0]->getPoint()<<endl;
-
-    cout << "success" << endl;
-    udp->closeData();*/
-    udp->closeData();
+    ia >> newDriver;
+    station->addNewDriver(*newDriver);
 }
 void insertTrip(TaxiCenter* station) {
     int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip;
@@ -160,6 +136,8 @@ void menu(TaxiCenter* station, Socket* udp) {
             station->startDriving();
             break;
         case 7:
+            udp->closeData();
+
             delete station;
             exit(0);
         default:

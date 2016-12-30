@@ -19,7 +19,8 @@ Driver TaxiCenter::findClosestDriver(Point* sourcePoint) {
 void TaxiCenter::addNewDriver(Driver newDriver) {
     CabFactory* matchingCab = this->findCabById(newDriver.getCabId());
     newDriver.setCab(matchingCab);
-    newDriver.setMap(this->dim);
+    //newDriver.setMap(this->dim);
+    newDriver.setLocation(dim->getPtrGrid()[0]);
     this->drivers.push_back(newDriver);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){

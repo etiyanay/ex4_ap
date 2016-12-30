@@ -27,7 +27,6 @@
 
 BOOST_CLASS_EXPORT_GUID(Point,"Point");
 BOOST_CLASS_EXPORT_GUID(CabFactory,"CabFactory");
-BOOST_CLASS_EXPORT_GUID(Grid,"Grid");
 
 using namespace std;
 using namespace boost::archive;
@@ -40,28 +39,17 @@ int main(int argc, char *argv[]) {
     udp.initialize();
 
     char buffer[1024];
-    /*int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
+    int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
     char statusOfDriver, dummy;
-    Driver newDriver;
+    Driver *gp;
     //getting input
     cin >> idOfDriver >> dummy >> ageOfDriver >> dummy >> statusOfDriver >> dummy
         >> experienceOfDriver >> dummy >> idVehicelOfDriver;
     //creating driver
-    newDriver = Driver(idOfDriver, ageOfDriver, Marital(statusOfDriver)
-            ,experienceOfDriver,idVehicelOfDriver);*/
+    gp = new Driver(idOfDriver, ageOfDriver, Marital(statusOfDriver)
+            ,experienceOfDriver,idVehicelOfDriver);
     //serializing
-    udp.sendData("hello");
 
-    udp.reciveData(buffer, sizeof(buffer));
-    cout << "client got: " << buffer << endl;
-    Point *p = new Point2D(2,2);
-    Point *y = new Point2D(3,3);
-    NodePoint* node = new NodePoint(p);
-    vector<NodePoint*> vec;
-    vec.push_back(node);
-    Trip *gp = new Trip(1234, p, y,5,20.5);
-    gp->setPath(vec);
-    //cout << "the x is: " <<((Point2D*)gp)->getX() << endl;
     std::string serial_str;
     boost::iostreams::back_insert_device<std::string> inserter(serial_str);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
@@ -100,7 +88,6 @@ int main(int argc, char *argv[]) {
     s.flush();
     cout << serial_str << endl;
     udp.sendData(serial_str);*/
-
 
 
     //loop trip

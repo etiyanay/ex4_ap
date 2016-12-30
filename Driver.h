@@ -7,8 +7,27 @@
 #include "Passenger.h"
 #include "Trip.h"
 #include "Grid.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/base_object.hpp>
 
 using namespace std;
+using namespace boost::archive;
+
 enum Marital {SINGLE = 'S',MARRIED = 'M',DIVORCED = 'D',WIDOWED = 'W'};
 /**
  * this is the class of the Driver, in charge of creating the a driver, manage his location,
@@ -23,7 +42,23 @@ private:
     //will be given by trip
     Trip currentTrip;
     NodePoint* location;
-    Grid* map;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version)
+    {
+        ar & id;
+        ar & age;
+        ar & yearsOfExperience;
+        ar & cabId;
+        ar & satisfactionAvg;
+        ar & totalScore;
+        ar & numOfPassengers;
+        ar & status;
+        ar & taxiCab;
+        ar & currentTrip;
+        ar & location;
+
+    }
 public:
     /**
      * default constructor
@@ -88,9 +123,9 @@ public:
      */
     int getId();
     /**
-     * @param map is the map of the grid to set in the driver
+     *
+     * @return
      */
-    void setMap(Grid* map);
     int getCabId();
 };
 
