@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include "TwoDim.h"
 #include "Point2D.h"
+#include <boost/serialization/export.hpp>
+
 
 using namespace std;
 
@@ -80,3 +82,4 @@ void TwoDim::initializeGrid() {
         }
     }
 }
+BOOST_CLASS_EXPORT(TwoDim)

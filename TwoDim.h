@@ -5,8 +5,28 @@
 #include "Point.h"
 #include "Grid.h"
 #include "vector"
+#include <fstream>
+#include <sstream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/array.hpp>
+
+#include <boost/multi_array.hpp>
 
 using namespace std;
+using namespace boost::archive;
 /**
  * this class derives from the abstract class- "Grid"
  * it represents the 2D map with Points2D
@@ -15,6 +35,15 @@ class TwoDim : public Grid {
 private:
     int sizeX, sizeY;
     NodePoint** ptrAllNodes;
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version)
+    {
+        ar & boost::serialization::base_object<Grid>(*this);
+        ar & sizeX;
+        ar & sizeY;
+        ar & *ptrAllNodes;
+    }
 public:
     /**
      * ctor

@@ -4,6 +4,7 @@
 #include "StandardCab.h"
 #include "CabFactory.h"
 #include "LuxuryCab.h"
+#include "TwoDim.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,9 +22,12 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
+#include <boost/array.hpp>
+#include <boost/multi_array.hpp>
+
 BOOST_CLASS_EXPORT_GUID(Point,"Point");
 BOOST_CLASS_EXPORT_GUID(CabFactory,"CabFactory");
-
+BOOST_CLASS_EXPORT_GUID(Grid,"Grid");
 
 using namespace std;
 using namespace boost::archive;
@@ -50,10 +54,13 @@ int main(int argc, char *argv[]) {
 
     udp.reciveData(buffer, sizeof(buffer));
     cout << "client got: " << buffer << endl;
-Point2D* x = new Point2D(2,2);
-    Point2D* y = new Point2D(3,3);
-
-    Trip *gp = new Trip(1234,x,y,5,20.5);
+    Point *p = new Point2D(2,2);
+    Point *y = new Point2D(3,3);
+    NodePoint* node = new NodePoint(p);
+    vector<NodePoint*> vec;
+    vec.push_back(node);
+    Trip *gp = new Trip(1234, p, y,5,20.5);
+    gp->setPath(vec);
     //cout << "the x is: " <<((Point2D*)gp)->getX() << endl;
     std::string serial_str;
     boost::iostreams::back_insert_device<std::string> inserter(serial_str);

@@ -17,6 +17,9 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/base_object.hpp>
 #include "CabFactory.h"
+
+using namespace std;
+using namespace boost::archive;
 /**
  * this is the class of the Luxury cab- derives from CabFactory
  */

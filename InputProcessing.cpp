@@ -6,6 +6,7 @@
 #include "StandardCab.h"
 #include "LuxuryCab.h"
 #include "Socket.h"
+#include "Trip.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/tokenizer.hpp>
@@ -91,7 +92,7 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     cout << "we are printing gp2: "<< gp2->getId()<<endl;
     cout << "we are tariff gp2: "<< gp2->getNumOfPassengers()<<endl;
     cout << "we are tariff gp2: "<< gp2->getStartPoint()<<endl;
-   // cout << "we are tariff gp2: "<< gp2->getPath().<<endl;
+   cout << "we are tariff gp2: "<< gp2->getPath()[0]->getPoint()<<endl;
 
 
     cout << "success point" << endl;
