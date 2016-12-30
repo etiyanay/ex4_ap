@@ -56,6 +56,7 @@ int Driver::getId() {
 }
 void Driver::setMap(Grid* map) {
     this->map = map;
+    setLocation(map->getPtrGrid()[0]);
 }
 int Driver::getCabId() {
     return this->cabId;

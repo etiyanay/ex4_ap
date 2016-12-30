@@ -70,20 +70,24 @@ void createObstacles(Grid* map) {
     }
 }
 void insertDriver(TaxiCenter* station, Socket* udp) {
+    int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
+    char statusOfDriver, dummy;
+    Driver newDriver;
+    cin >> idOfDriver >> dummy >> ageOfDriver >> dummy >> statusOfDriver >> dummy
+        >> experienceOfDriver >> dummy >> idVehicelOfDriver;
+    newDriver = Driver(idOfDriver, ageOfDriver, Marital(statusOfDriver) ,
+                       experienceOfDriver,idVehicelOfDriver);
+    station->addNewDriver(newDriver);
+
     /*int idVehicelOfDriver;
-    Driver newDriver;*/
+    Driver newDriver;
     char buffer[1024];
     udp->reciveData(buffer, sizeof(buffer));
     cout << "we are printing hello: "<< buffer<<endl;
     udp->sendData("cab");
-
-
     char buffer2[1024];
     udp->reciveData(buffer2, sizeof(buffer2));
-
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
-
-    //serial_str = buffer2;
     Trip *gp2;
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
@@ -94,28 +98,9 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     cout << "we are tariff gp2: "<< gp2->getStartPoint()<<endl;
    cout << "we are tariff gp2: "<< gp2->getPath()[0]->getPoint()<<endl;
 
-
-    cout << "success point" << endl;
-    //cout << "server got: " << buffer << endl;
-    //newDriver=diserialize(buffer)
-    //station->addNewDriver(newDriver);
-    //newDriver.getCab> serialize -> send the cab to client
-
-
-    /* NodePoint *node;
-     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
-     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
-     boost::archive::binary_iarchive ia(s2);
-     ia >> node;
-     cout << "we are printing cab2: "<< node->getPoint()<<endl;
-     if (node->isVisited() == 0)
-         cout << "not visited" << endl;*/
-
-
-    cout << "success node" << endl;
-
+    cout << "success" << endl;
+    udp->closeData();*/
     udp->closeData();
-
 }
 void insertTrip(TaxiCenter* station) {
     int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip;
