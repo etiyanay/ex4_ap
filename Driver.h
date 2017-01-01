@@ -7,6 +7,7 @@
 #include "Passenger.h"
 #include "Trip.h"
 #include "Grid.h"
+#include "Clock.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -42,6 +43,8 @@ private:
     //will be given by trip
     Trip currentTrip;
     NodePoint* location;
+    bool isAvailable;
+    Clock time;
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version)
@@ -57,7 +60,8 @@ private:
         ar & taxiCab;
         ar & currentTrip;
         ar & location;
-
+        ar & isAvailable;
+        ar & time;
     }
 public:
     /**
@@ -127,6 +131,8 @@ public:
      * @return
      */
     int getCabId();
+    bool setIsAvailable();
+    bool getIsAvailable();
 };
 
 #endif //AP_EX1_DRIVER_H

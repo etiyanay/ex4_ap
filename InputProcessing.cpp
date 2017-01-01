@@ -92,20 +92,20 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     udp->sendData(serial_str2);
 }
 void insertTrip(TaxiCenter* station) {
-    int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip;
+    int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip, clockTimeTrip;
     double tariffTrip;
     char dummy;
     Point *source, *destination;
     Point2D p2DStart, p2DEnd;
     Trip newTrip;
     cin >> idOfTrip >> dummy >> xStartTrip >> dummy >> yStartTrip >> dummy >> xEndTrip >> dummy
-        >> yEndTrip >> dummy >> numOfPassengerTrip >> dummy >> tariffTrip;
+        >> yEndTrip >> dummy >> numOfPassengerTrip >> dummy >> tariffTrip >> dummy >> clockTimeTrip;
     p2DStart = Point2D(xStartTrip, yStartTrip);
     p2DEnd = Point2D(xEndTrip, yEndTrip);
     source = &p2DStart;
     destination = &p2DEnd;
     //creating new trip
-    newTrip = Trip(idOfTrip, source, destination, numOfPassengerTrip, tariffTrip);
+    newTrip = Trip(idOfTrip, source, destination, numOfPassengerTrip, tariffTrip, clockTimeTrip);
     //adding the trip to the taxi center
     station->addNewTrip(newTrip);
 }
@@ -129,10 +129,11 @@ void driverLocationRequest(TaxiCenter* station) {
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
 void menu(TaxiCenter* station, Socket* udp) {
-    int extension;
+    int extension, numOfDrivers, clock = 0;
     cin >> extension;
     switch (extension) {
         case 1:
+            cin >> numOfDrivers;
             insertDriver(station, udp);
             break;
         case 2:
@@ -144,7 +145,8 @@ void menu(TaxiCenter* station, Socket* udp) {
         case 4:
             driverLocationRequest(station);
             break;
-        case 6:
+        case 9:
+            station->advenceTime();
             station->assignTripsToDrivers();
             station->startDriving();
             break;

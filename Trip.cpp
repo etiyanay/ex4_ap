@@ -3,12 +3,13 @@
 
 using namespace std;
 
-Trip::Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff) {
+Trip::Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff, int clockTimeTrip) {
     this->id = id;
     this->startPoint = source;
     this->endPoint = destination;
     this->tariff = tariff;
     this->numOfPassengers = numOfPassengers;
+    this->clockTimeTrip = clockTimeTrip;
 }
 Trip::Trip(int currentId, Point* source, Point* destination, double tariff,
            vector <Passenger*> currentPassengers) {
@@ -18,6 +19,7 @@ Trip::Trip(int currentId, Point* source, Point* destination, double tariff,
     this->tariff = tariff;
     this->currentPassengers = currentPassengers;
     this->numOfPassengers = currentPassengers.size();
+    this->clockTimeTrip = -1;
 }
 double Trip::getTripCost(){
     return this->tariff;
@@ -46,4 +48,8 @@ int Trip::passengersSendScore() {
         totalScore += this->currentPassengers[i]->sendRandomScore();
     }
     return totalScore;
+}
+
+int Trip::getClockTimeTrip() {
+    return this->clockTimeTrip;
 }

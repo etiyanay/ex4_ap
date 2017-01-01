@@ -31,7 +31,7 @@ using namespace boost::archive;
  */
 class Trip {
 private:
-    int id, metersPassed, numOfPassengers;
+    int id, metersPassed, numOfPassengers, clockTimeTrip;
     Point *startPoint, *endPoint;
     double tariff;
     vector <NodePoint*> path;
@@ -48,7 +48,7 @@ private:
         ar & tariff;
         ar & path;
         ar & currentPassengers;
-
+        ar & clockTimeTrip;
     }
 public:
     /**
@@ -65,7 +65,7 @@ public:
      * @param tariff the cost of the trip
      * @return a new trip
      */
-    Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff);
+    Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff, int clockTimeTrip);
     /**
      * ctor
      * @param id the trip's id
@@ -113,7 +113,7 @@ public:
      * @return the total sum of the satisfaction score from all the passengers in the current trip
      */
     int passengersSendScore();
-    };
+    int getClockTimeTrip();
 
-
+};
 #endif //AP_EX1_TRIP_H

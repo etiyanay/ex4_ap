@@ -5,6 +5,7 @@ using namespace std;
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
+    this->clock = 0;
 }
 TaxiCenter::~TaxiCenter() {
     delete this->dim;
@@ -89,4 +90,65 @@ void TaxiCenter::startDriving() {
         sizeOfPath = this->drivers[i].getTrip().getPath().size();
         this->drivers[i].setLocation(this->drivers[i].getTrip().getPath()[sizeOfPath - 1]);
     }
+}
+int TaxiCenter::timeIs() {
+    return this->clock;
+}
+
+void TaxiCenter::advenceTime() {
+    this->clock = this->clock + 1;
+}
+
+void TaxiCenter::assignTripToDriver(Driver currentDriver) {
+    /*
+     * פונקציה שצריכה לעבור על כל הטריפס ובמידה והטריפ מתאים לשמור את האינדקס שלו
+
+     * נמשיך בלולאה ואם נמצא עוד טריפ שמתחיל באותה נקודה אך מתחיל בזמן מוקדם יותר
+     * change isAvailable to false
+     * delete trip from trips in taxiCenter
+     */
+}
+void TaxiCenter::MoveOneStep() {
+    int i;
+    int theXstep = 0;
+    int numOfDrivers = this->getNumOfDrivers();
+    for (i = 0; i < numOfDrivers; i++) {
+        if (this->drivers[i].getIsAvailable() == false) {
+            if (this->drivers[i].getTrip().getClockTimeTrip() >= this->timeIs()) {
+                //move logic to driver
+                if (drivers[i].getCab()->getSpeed() == 1) {
+                    theXstep = this->timeIs() - (this->drivers[i].getTrip().getClockTimeTrip());
+                    this->drivers[i].setLocation(this->drivers[i].getTrip().getPath()[theXstep]);
+//ובנוסף שולח בסוקט את המיקום החדש של הנהג
+                } else if (drivers[i].getCab()->getSpeed() == 2) {
+                    /********************************************************/
+                    /*can be theXstep*2 but not always move 2 steps*/
+                }
+                if (this->drivers[i].getTrip().getPath().size() - 1 == theXstep) {
+                    //delete the trip from **driver** and from trip list?
+                    //not good in set new trip if we have some drivers and some of them didnt funush their path
+                    //i think if we deleting in up 'if'- we doesnt need to do nothing anymore here
+                    this->drivers[i].setIsAvailable();
+                }
+            }
+        } else {
+            this->assignTripToDriver(this->drivers[i]);
+//     ובנוסף שולח לקליינט בסוקט את הTRIP של הנהג
+        }
+    }
+    /*לולאת פור על כל הנהגים, לכל נהג נבדוק:
+    האם הממבר 'זמין' שלו שווה לאפס(כלומר זמין):
+     אם זמין נזמן ASSIGNTRIPTODRIVER ונשלח בפונק את הנהג של איטרציה זו
+     ובנוסף שולח לקליינט בסוקט את הTRIP של הנהג
+אם הממבר 'זמין' שלו שווה לאחד (כלומר לא זמין):
+     נקדם את הנהג בצעד (BFS ב*זמן נוכחי פחות זמן ההתחלה של הטריפ*)
+     אם הגענן לסוף הטריפ נעדכן את 'זמין' להיות אפס
+     ובנוסף שולח בסוקט את המיקום החדש של הנהג
+גם בקליינט אם הגענו לסוף הטריפ נעדכן את 'זמין' להיות אפס
+     */
+        //לבדוק שזה הזמן להתחיל לזוז
+     //זמין בדרייבר
+    //הוספת ממבר של זמן התחלה לכל טריפ
+//-1 in fictive constructor of trip
+    //contructor of driver (the first)
 }

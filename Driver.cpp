@@ -6,6 +6,7 @@ Driver::Driver() {
     this->numOfPassengers =0;
     this->satisfactionAvg =0;
     this->totalScore = 0;
+    this->time = Clock(0);
 }
 Driver::Driver(int id, int age, Marital status, int yearsOfExperience, int cabId) {
     this->id = id;
@@ -16,6 +17,9 @@ Driver::Driver(int id, int age, Marital status, int yearsOfExperience, int cabId
     this->satisfactionAvg =0;
     this->totalScore = 0;
     this->cabId = cabId;
+    this->isAvailable = 0;
+    this->time = Clock(0);
+
 }
 double Driver::evaluateSatisfaction() {
     return this->totalScore / this->numOfPassengers;
@@ -56,4 +60,10 @@ int Driver::getId() {
 }
 int Driver::getCabId() {
     return this->cabId;
+}
+bool Driver::setIsAvailable() {
+    this->isAvailable = !this->isAvailable;
+}
+bool Driver::getIsAvailable() {
+    return this->isAvailable;
 }

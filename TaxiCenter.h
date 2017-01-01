@@ -17,6 +17,7 @@ private:
     vector <Trip> trips;
     Bfs* currentBfs;
     Grid* dim;
+    int clock;
 public:
     /**
      * default constructor
@@ -88,6 +89,11 @@ public:
      * @return the num of trips in the taxi center
      */
     int getNumOfTrips();
+    void advenceTime();
+    int timeIs();
+    void assignTripToDriver(Driver currentDriver);
+    void MoveOneStep();
+
     };
 
 #endif //AP_EX1_TAXICENTER_H
