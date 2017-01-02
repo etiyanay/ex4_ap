@@ -17,7 +17,9 @@ private:
     vector <Trip> trips;
     Bfs* currentBfs;
     Grid* dim;
-    int clock;
+    Clock time;
+    bool firstTripFlag;
+
 public:
     /**
      * default constructor
@@ -89,10 +91,10 @@ public:
      * @return the num of trips in the taxi center
      */
     int getNumOfTrips();
-    void advenceTime();
+    void advanceTime();
     int timeIs();
-    void assignTripToDriver(Driver currentDriver);
-    void MoveOneStep();
+    void assignTripToDriver(int currentDriverIndex);
+    void moveAllDriversOneStep();
 
     };
 

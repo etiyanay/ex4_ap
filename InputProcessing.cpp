@@ -146,11 +146,11 @@ void menu(TaxiCenter* station, Socket* udp) {
             driverLocationRequest(station);
             break;
         case 9:
-            station->advenceTime();
-            station->assignTripsToDrivers();
-            station->startDriving();
+            station->advanceTime();
+            station->moveAllDriversOneStep();
             break;
         case 7:
+            //sendData("shutDown");
             udp->closeData();
             delete station;
             exit(0);

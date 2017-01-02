@@ -5,7 +5,8 @@ using namespace std;
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
-    this->clock = 0;
+    this->time = Clock(0);
+    this->firstTripFlag = false;
 }
 TaxiCenter::~TaxiCenter() {
     delete this->dim;
@@ -22,6 +23,7 @@ void TaxiCenter::addNewDriver(Driver newDriver) {
     newDriver.setCab(matchingCab);
     //newDriver.setMap(this->dim);
     newDriver.setLocation(dim->getPtrGrid()[0]);
+    newDriver.setClock(this->time);
     this->drivers.push_back(newDriver);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
@@ -92,51 +94,45 @@ void TaxiCenter::startDriving() {
     }
 }
 int TaxiCenter::timeIs() {
-    return this->clock;
+    return this->time.timeIs();
 }
 
-void TaxiCenter::advenceTime() {
-    this->clock = this->clock + 1;
+void TaxiCenter::advanceTime() {
+    this->time.advanceTime();
+    for(int i=0; i< this->drivers.size(); i++){
+        drivers[i].advanceClockOfDriver();
+    }
 }
 
-void TaxiCenter::assignTripToDriver(Driver currentDriver) {
-    /*
-     * פונקציה שצריכה לעבור על כל הטריפס ובמידה והטריפ מתאים לשמור את האינדקס שלו
-
-     * נמשיך בלולאה ואם נמצא עוד טריפ שמתחיל באותה נקודה אך מתחיל בזמן מוקדם יותר
-     * change isAvailable to false
-     * delete trip from trips in taxiCenter
-     */
+void TaxiCenter::assignTripToDriver(int currentDriverIndex) {
+    int i, indexOfRelevantTrip = -1;
+        for(i = 0; i < this->getNumOfTrips(); i++) {
+            //check if the trip starts where the driver is
+            if ((this->drivers[currentDriverIndex].getLocationInGrid()->getPoint()->equals
+                    (trips[i].getPath()[0]->getPoint())) &&
+                    ((this->trips[i].getClockTimeTrip() == this->timeIs()))) {
+                indexOfRelevantTrip = i;
+            }
+    }
+    //if we did find a correct trip - assign it
+    if (indexOfRelevantTrip != -1) {
+        //attach the trip to the driver
+        this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
+        //delete the trip that has been set to the driver
+        this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
+        this->drivers[currentDriverIndex].setIsAvailable(false);
+    }
 }
-void TaxiCenter::MoveOneStep() {
+void TaxiCenter::moveAllDriversOneStep() {
     int i;
-    int theXstep = 0;
     int numOfDrivers = this->getNumOfDrivers();
     for (i = 0; i < numOfDrivers; i++) {
         if (this->drivers[i].getIsAvailable() == false) {
-            if (this->drivers[i].getTrip().getClockTimeTrip() >= this->timeIs()) {
-                //move logic to driver
-                if (drivers[i].getCab()->getSpeed() == 1) {
-                    theXstep = this->timeIs() - (this->drivers[i].getTrip().getClockTimeTrip());
-                    this->drivers[i].setLocation(this->drivers[i].getTrip().getPath()[theXstep]);
-//ובנוסף שולח בסוקט את המיקום החדש של הנהג
-                } else if (drivers[i].getCab()->getSpeed() == 2) {
-                    /********************************************************/
-                    /*can be theXstep*2 but not always move 2 steps*/
-                }
-                if (this->drivers[i].getTrip().getPath().size() - 1 == theXstep) {
-                    //delete the trip from **driver** and from trip list?
-                    //not good in set new trip if we have some drivers and some of them didnt funush their path
-                    //i think if we deleting in up 'if'- we doesnt need to do nothing anymore here
-                    this->drivers[i].setIsAvailable();
-                }
-            }
+            drivers[i].moveOneStep();
         } else {
-            this->assignTripToDriver(this->drivers[i]);
-//     ובנוסף שולח לקליינט בסוקט את הTRIP של הנהג
+                this->assignTripToDriver(i);
         }
-    }
-    /*לולאת פור על כל הנהגים, לכל נהג נבדוק:
+    }   /*לולאת פור על כל הנהגים, לכל נהג נבדוק:
     האם הממבר 'זמין' שלו שווה לאפס(כלומר זמין):
      אם זמין נזמן ASSIGNTRIPTODRIVER ונשלח בפונק את הנהג של איטרציה זו
      ובנוסף שולח לקליינט בסוקט את הTRIP של הנהג

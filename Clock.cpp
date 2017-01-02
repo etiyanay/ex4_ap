@@ -9,9 +9,9 @@ using namespace std;
 Clock::Clock(int time) {
     this->time = time;
 }
-int Clock::timeIs() {
-    return this->time;
-}
 void Clock::advanceTime() {
     this->time +=1;
+}
+int Clock::timeIs() {
+    return this->time;
 }
