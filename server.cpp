@@ -27,11 +27,9 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    /*testing::InitGoogleTest(&argc, argv);
-    RUN_ALL_TESTS();*/
     cout << "Hello, from server" << endl;
     //server commands
-    Socket* udp = new Udp(1, 1212);
+    Socket* udp = new Udp(1, atoi(argv[1]));
     udp->initialize();
 
 

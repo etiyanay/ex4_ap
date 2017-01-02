@@ -35,8 +35,8 @@ using namespace boost::archive;
 int main(int argc, char *argv[]) {
     std::cout << "Hello, from client" << std::endl;
 
-    cout << argv[1] << endl;
-    Udp udp(0, atoi(argv[1]));
+    cout << argv[2] << endl;
+    Udp udp(argv[1], atoi(argv[2]));
     udp.initialize();
 
     char buffer[1024];

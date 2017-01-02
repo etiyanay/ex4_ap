@@ -72,7 +72,6 @@ void Driver::setClock(Clock time) {
     this->time = time;
 }
 void Driver::moveOneStep(){
-    //change the implementation to check if arrived dest
     int pathIndex = this->time.timeIs() - (this->getTrip().getClockTimeTrip());
     int cabType = this->getCab()->getSpeed();
     int tripSize = this->getTrip().getPath().size();
@@ -87,6 +86,7 @@ void Driver::moveOneStep(){
         else
             this->setLocation(this->getTrip().getPath()[pathIndex * 2]);
     }
+    //maybe send GO to client
     if (this->getLocationInGrid()->getPoint()->equals
             (this->getTrip().getPath()[tripSize - 1]->getPoint())) {
         this->setIsAvailable(true);

@@ -121,6 +121,8 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex) {
         //delete the trip that has been set to the driver
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
         this->drivers[currentDriverIndex].setIsAvailable(false);
+        //sending trip to client
+
     }
 }
 void TaxiCenter::moveAllDriversOneStep() {
@@ -129,6 +131,7 @@ void TaxiCenter::moveAllDriversOneStep() {
     for (i = 0; i < numOfDrivers; i++) {
         if (this->drivers[i].getIsAvailable() == false) {
             drivers[i].moveOneStep();
+            //sending driver location
         } else {
                 this->assignTripToDriver(i);
         }
