@@ -43,7 +43,7 @@ private:
     //will be given by trip
     Trip currentTrip;
     NodePoint* location;
-    bool isAvailable, isOnRide;
+    bool isAvailable;
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version)
@@ -60,7 +60,6 @@ private:
         ar & currentTrip;
         ar & location;
         ar & isAvailable;
-        ar & isOnRide;
     }
 public:
     /**

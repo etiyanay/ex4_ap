@@ -17,7 +17,6 @@ Driver::Driver(int id, int age, Marital status, int yearsOfExperience, int cabId
     this->totalScore = 0;
     this->cabId = cabId;
     this->isAvailable = true;
-    this->isOnRide = false;
 }
 double Driver::evaluateSatisfaction() {
     return this->totalScore / this->numOfPassengers;
