@@ -4,35 +4,13 @@
 #include "NodePoint.h"
 #include "vector"
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/array.hpp>
-#include <boost/multi_array.hpp>
-
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/base_object.hpp>
 
 using namespace std;
-using namespace boost::archive;
 /**
  * this class is an abstract class which TwoDim class derives from it
  * the class is in charge of the grid (= map)
  */
 class Grid {
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive &ar, const unsigned int version) {}
 public:
     /**
      * constructor
@@ -72,6 +50,5 @@ public:
      */
     virtual void initializeGrid()=0;
 };
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(Grid)
 
 #endif //AP_EX1_GRID_H

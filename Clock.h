@@ -1,7 +1,3 @@
-//
-// Created by naama on 01/01/17.
-//
-
 #ifndef AP_EX1_CLOCK_H
 #define AP_EX1_CLOCK_H
 #include <fstream>
@@ -17,7 +13,6 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-
 #include <boost/serialization/access.hpp>
 using namespace std;
 using namespace boost::archive;

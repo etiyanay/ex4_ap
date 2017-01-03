@@ -5,24 +5,7 @@
 #include "TaxiCenter.h"
 #include "StandardCab.h"
 #include "LuxuryCab.h"
-#include "Socket.h"
-#include "Trip.h"
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-
-#include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
-
-
 
 using namespace std;
 using namespace boost::archive;
@@ -78,7 +61,7 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     boost::archive::binary_iarchive ia(s2);
     ia >> newDriver;
     station->addNewDriver(*newDriver);
-
+    //sending matching cab to client
     CabFactory* matchingCab;
     matchingCab = station->findCabById(newDriver->getCabId());
     //serializing
@@ -148,12 +131,11 @@ void menu(TaxiCenter* station, Socket* udp) {
         case 9:
             station->advanceTime();
             station->moveAllDriversOneStep(udp);
-            //get the newlocation
             break;
         case 7:
-            //sendData("shutDown");
             udp->sendData("close");
             udp->closeData();
+            delete udp;
             delete station;
             exit(0);
         default:

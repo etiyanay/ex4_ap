@@ -1,7 +1,3 @@
-//
-// Created by naama on 01/01/17.
-//
-
 #include "Clock.h"
 
 using namespace std;

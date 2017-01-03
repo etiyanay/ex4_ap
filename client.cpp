@@ -1,31 +1,7 @@
 #include "Udp.h"
 #include "Driver.h"
 #include "InputProcessing.h"
-#include "Point2D.h"
-#include "StandardCab.h"
-#include "CabFactory.h"
-#include "LuxuryCab.h"
-#include "TwoDim.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/access.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/array.hpp>
-#include <boost/multi_array.hpp>
-
 BOOST_CLASS_EXPORT_GUID(Point,"Point");
 BOOST_CLASS_EXPORT_GUID(CabFactory,"CabFactory");
 
@@ -75,6 +51,7 @@ int main(int argc, char *argv[]) {
         udp.reciveData(buffer3, sizeof(buffer3));
         string serial_trip = bufferToString(buffer3, sizeof(buffer3));
         if (strcmp(serial_trip.data(), "close") ==0) {
+            delete newDriver;
             return 0;
         }
         boost::iostreams::basic_array_source<char> device2(serial_trip.c_str(), serial_trip.size());
@@ -92,6 +69,7 @@ int main(int argc, char *argv[]) {
             udp.reciveData(newLocationBuffer, sizeof(newLocationBuffer));
             string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
             if (strcmp(serial_location.data(), "close") ==0) {
+                delete newDriver;
                 return 0;
             }
             boost::iostreams::basic_array_source<char> device3(serial_location.c_str(), serial_location.size());

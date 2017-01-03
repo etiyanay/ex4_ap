@@ -1,6 +1,4 @@
 #include "TaxiCenter.h"
-#include "Socket.h"
-#include "InputProcessing.h"
 
 using namespace std;
 
@@ -17,7 +15,6 @@ TaxiCenter::~TaxiCenter() {
         delete this->cabs[i];
     }
 }
-
 Driver TaxiCenter::findClosestDriver(Point* sourcePoint) {
     //default id
 }

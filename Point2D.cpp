@@ -1,8 +1,4 @@
 #include "Point2D.h"
-#include <iostream>
-#include "Point2D.h"
-#include <string>
-#include <sstream>
 #include <boost/serialization/export.hpp>
 
 using namespace std;
