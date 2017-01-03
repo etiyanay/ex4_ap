@@ -5,6 +5,7 @@
 #include "Driver.h"
 #include "Grid.h"
 #include "Bfs.h"
+#include "Socket.h"
 
 using namespace std;
 /**
@@ -19,6 +20,7 @@ private:
     Grid* dim;
     Clock time;
     bool firstTripFlag;
+    bool availableToReceiveData;
 
 public:
     /**
@@ -93,8 +95,10 @@ public:
     int getNumOfTrips();
     void advanceTime();
     int timeIs();
-    void assignTripToDriver(int currentDriverIndex);
-    void moveAllDriversOneStep();
+    void assignTripToDriver(int currentDriverIndex, Socket* udp);
+    void moveAllDriversOneStep(Socket* udp);
+    void setReceiveDataFlag(bool flag);
+    bool getReceiveDataFlag();
 
     };
 

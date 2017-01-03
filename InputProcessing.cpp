@@ -147,11 +147,12 @@ void menu(TaxiCenter* station, Socket* udp) {
             break;
         case 9:
             station->advanceTime();
-            station->moveAllDriversOneStep();
+            station->moveAllDriversOneStep(udp);
             //get the newlocation
             break;
         case 7:
             //sendData("shutDown");
+            udp->sendData("close");
             udp->closeData();
             delete station;
             exit(0);

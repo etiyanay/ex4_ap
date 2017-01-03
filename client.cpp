@@ -33,12 +33,9 @@ using namespace std;
 using namespace boost::archive;
 
 int main(int argc, char *argv[]) {
-    std::cout << "Hello, from client" << std::endl;
-
-    cout << argv[2] << endl;
     Udp udp(argv[1], atoi(argv[2]));
     udp.initialize();
-
+//
     char buffer[1024];
     int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
     char statusOfDriver, dummy;
@@ -70,37 +67,40 @@ int main(int argc, char *argv[]) {
     ia >> matchingCab;
     newDriver->setCab(matchingCab);
 
-
-    /*udp.reciveData(buffer, sizeof(buffer));
-    //attach the cab to driver in the member
-    //CabFactory *newCab = diserializebuffer
-    //newDriver.setCab(newCab)
-    cout << "client got: " << buffer << endl;*/
-
-    /*CabFactory* matchingCab;
-    matchingCab = new StandardCab(1,FIAT, WHITE);
-    //serializing
-    std::string serial_str2;
-    boost::iostreams::back_insert_device<std::string> inserter(serial_str2);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-    boost::archive::binary_oarchive oa(s);
-    oa << matchingCab;
-    s.flush();
-    //sending the serialized cab
-    udp.sendData(serial_str2);*/
-
-    /*char buffer2[1024];
-    udp.reciveData(buffer2, sizeof(buffer2));
-    string serial_str = bufferToString(buffer2, sizeof(buffer2));
-    boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
-    boost::archive::binary_iarchive ia(s2);
-    ia >> matchingCab;
-    //newDriver->setCab(matchingCab);
-    cout<< matchingCab->getID()<<endl;*/
-
-
-
-    //loop trip
-    return 0;
+    while (1) {
+        udp.sendData("wait_for_a_trip");
+        //getting the trip -> diserialize
+        char buffer3[1024];
+        Trip *newTrip;
+        udp.reciveData(buffer3, sizeof(buffer3));
+        string serial_trip = bufferToString(buffer3, sizeof(buffer3));
+        if (strcmp(serial_trip.data(), "close") ==0) {
+            return 0;
+        }
+        boost::iostreams::basic_array_source<char> device2(serial_trip.c_str(), serial_trip.size());
+        boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(device2);
+        boost::archive::binary_iarchive ia2(s3);
+        ia2 >> newTrip;
+        newDriver->setNewTrip(*newTrip);
+        //
+        NodePoint *newLocation;
+        int sizeOfTrip = newDriver->getTrip().getPath().size();
+        for (int i = 1; i < sizeOfTrip; ++i) {
+            udp.sendData("wait_for_GO");
+            //
+            char newLocationBuffer[1024];
+            udp.reciveData(newLocationBuffer, sizeof(newLocationBuffer));
+            string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
+            if (strcmp(serial_location.data(), "close") ==0) {
+                return 0;
+            }
+            boost::iostreams::basic_array_source<char> device3(serial_location.c_str(), serial_location.size());
+            boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s4(device3);
+            boost::archive::binary_iarchive ia3(s4);
+            ia3 >> newLocation;
+            newDriver->setLocation(newLocation);
+            if (newDriver->getCab()->getSpeed() == 2)
+                i++;
+            }
+    }
 }

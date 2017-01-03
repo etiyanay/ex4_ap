@@ -1,4 +1,6 @@
 #include "TaxiCenter.h"
+#include "Socket.h"
+#include "InputProcessing.h"
 
 using namespace std;
 
@@ -7,6 +9,7 @@ TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->currentBfs = currentBfs;
     this->time = Clock(0);
     this->firstTripFlag = false;
+    this->availableToReceiveData = true;
 }
 TaxiCenter::~TaxiCenter() {
     delete this->dim;
@@ -104,7 +107,14 @@ void TaxiCenter::advanceTime() {
     }
 }
 
-void TaxiCenter::assignTripToDriver(int currentDriverIndex) {
+void TaxiCenter::setReceiveDataFlag(bool flag) {
+    this->availableToReceiveData = flag;
+}
+bool TaxiCenter::getReceiveDataFlag(){
+    return this->availableToReceiveData;
+}
+
+void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* udp) {
     int i, indexOfRelevantTrip = -1;
         for(i = 0; i < this->getNumOfTrips(); i++) {
             //check if the trip starts where the driver is
@@ -116,24 +126,54 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex) {
     }
     //if we did find a correct trip - assign it
     if (indexOfRelevantTrip != -1) {
+        //serializing
+        this->trips[indexOfRelevantTrip].setStartPoint();
+        this->trips[indexOfRelevantTrip].setEndPoint();
+        Trip *newTrip;
+        newTrip = &this->trips[indexOfRelevantTrip];
+        string serial_trip;
+        boost::iostreams::back_insert_device<std::string> inserter(serial_trip);
+        boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+        boost::archive::binary_oarchive oa(s);
+        oa << newTrip;
+        s.flush();
+
         //attach the trip to the driver
         this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
         //delete the trip that has been set to the driver
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
         this->drivers[currentDriverIndex].setIsAvailable(false);
-        //sending trip to client
-
+        //sending the serialized cab to client
+        udp->sendData(serial_trip);
+        this->setReceiveDataFlag(true);
     }
 }
-void TaxiCenter::moveAllDriversOneStep() {
+void TaxiCenter::moveAllDriversOneStep(Socket* udp) {
     int i;
     int numOfDrivers = this->getNumOfDrivers();
     for (i = 0; i < numOfDrivers; i++) {
+        char buffer[1024];
+        if (this->getReceiveDataFlag()) {
+            //receiveData- want trip/want go
+            udp->reciveData(buffer, sizeof(buffer));
+            this->setReceiveDataFlag(false);
+        }
         if (this->drivers[i].getIsAvailable() == false) {
             drivers[i].moveOneStep();
-            //sending driver location
+
+            //serializing and sending new location of driver - to client
+            NodePoint *newLocation = this->drivers[i].getLocationInGrid();
+            string serial_driverNewLocation;
+            boost::iostreams::back_insert_device<std::string> inserter(serial_driverNewLocation);
+            boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+            boost::archive::binary_oarchive oa(s);
+            oa << newLocation;
+            s.flush();
+            udp->sendData(serial_driverNewLocation);
+            this->setReceiveDataFlag(true);
+
         } else {
-                this->assignTripToDriver(i);
+                this->assignTripToDriver(i, udp);
         }
     }   /*לולאת פור על כל הנהגים, לכל נהג נבדוק:
     האם הממבר 'זמין' שלו שווה לאפס(כלומר זמין):

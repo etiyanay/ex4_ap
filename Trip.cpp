@@ -36,6 +36,12 @@ int Trip::getId() {
 void Trip::setPath(vector <NodePoint*> newPath) {
     this->path = newPath;
 }
+void Trip::setStartPoint() {
+    this->startPoint = this->getPath()[0]->getPoint();
+}
+void Trip::setEndPoint() {
+    this->endPoint = this->getPath()[this->getPath().size()-1]->getPoint();
+}
 vector <NodePoint*> Trip::getPath() {
     return this->path;
 }

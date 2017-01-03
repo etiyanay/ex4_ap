@@ -27,12 +27,9 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    cout << "Hello, from server" << endl;
     //server commands
     Socket* udp = new Udp(1, atoi(argv[1]));
     udp->initialize();
-
-
     //initialize taxi center
     int xGrid, yGrid;
     cin >> xGrid >> yGrid;
@@ -41,8 +38,7 @@ int main(int argc, char* argv[]) {
     TaxiCenter* station = new TaxiCenter(map, &currentBfs);
     //initializing obstacles
     createObstacles(map);
-
-
+    //running menu
     while (1) {
         menu(station, udp);
     }

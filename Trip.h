@@ -43,12 +43,12 @@ private:
         ar & id;
         ar & metersPassed;
         ar & numOfPassengers;
+        ar & clockTimeTrip;
         ar & startPoint;
         ar & endPoint;
         ar & tariff;
         ar & path;
         ar & currentPassengers;
-        ar & clockTimeTrip;
     }
 public:
     /**
@@ -97,6 +97,8 @@ public:
      * @return the destination point of the trip
      */
     Point* getEndPoint();
+    void setStartPoint();
+    void setEndPoint();
     /**
      * @param newPath the path of the trip (the nodePoints by order) to the destination
      */
