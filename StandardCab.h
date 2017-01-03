@@ -13,10 +13,8 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/base_object.hpp>
-
 #include "CabFactory.h"
 
 using namespace std;
