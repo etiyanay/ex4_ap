@@ -44,7 +44,6 @@ private:
     Trip currentTrip;
     NodePoint* location;
     bool isAvailable, isOnRide;
-    Clock time;
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version)
@@ -61,7 +60,6 @@ private:
         ar & currentTrip;
         ar & location;
         ar & isAvailable;
-        ar & time;
         ar & isOnRide;
     }
 public:
@@ -134,11 +132,7 @@ public:
     int getCabId();
     bool setIsAvailable(bool flag);
     bool getIsAvailable();
-    void setClock(Clock time);
-    void moveOneStep();
-    void advanceClockOfDriver();
-    bool ifOnRide();
-    void setOnRide(bool flag);
+    void moveOneStep(int time);
 };
 
 #endif //AP_EX1_DRIVER_H

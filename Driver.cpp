@@ -6,7 +6,6 @@ Driver::Driver() {
     this->numOfPassengers =0;
     this->satisfactionAvg =0;
     this->totalScore = 0;
-    this->time = Clock(0);
 }
 Driver::Driver(int id, int age, Marital status, int yearsOfExperience, int cabId) {
     this->id = id;
@@ -19,8 +18,6 @@ Driver::Driver(int id, int age, Marital status, int yearsOfExperience, int cabId
     this->cabId = cabId;
     this->isAvailable = true;
     this->isOnRide = false;
-    this->time = Clock(0);
-
 }
 double Driver::evaluateSatisfaction() {
     return this->totalScore / this->numOfPassengers;
@@ -68,11 +65,9 @@ bool Driver::setIsAvailable(bool flag) {
 bool Driver::getIsAvailable() {
     return this->isAvailable;
 }
-void Driver::setClock(Clock time) {
-    this->time = time;
-}
-void Driver::moveOneStep(){
-    int pathIndex = this->time.timeIs() - (this->getTrip().getClockTimeTrip());
+
+void Driver::moveOneStep(int time){
+    int pathIndex = time - (this->getTrip().getClockTimeTrip());
     int cabType = this->getCab()->getSpeed();
     int tripSize = this->getTrip().getPath().size();
     if (cabType == 1) {
@@ -90,15 +85,5 @@ void Driver::moveOneStep(){
     if (this->getLocationInGrid()->getPoint()->equals
             (this->getTrip().getPath()[tripSize - 1]->getPoint())) {
         this->setIsAvailable(true);
-        this->setOnRide(false);
     }
-}
-void Driver::advanceClockOfDriver() {
-    this->time.advanceTime();
-}
-bool Driver::ifOnRide() {
-    return this->isOnRide;
-}
-void Driver::setOnRide(bool flag){
-    this->isOnRide = flag;
 }

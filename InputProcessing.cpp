@@ -129,7 +129,7 @@ void driverLocationRequest(TaxiCenter* station) {
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
 void menu(TaxiCenter* station, Socket* udp) {
-    int extension, numOfDrivers, clock = 0;
+    int extension, numOfDrivers;
     cin >> extension;
     switch (extension) {
         case 1:

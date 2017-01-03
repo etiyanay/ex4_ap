@@ -26,7 +26,6 @@ void TaxiCenter::addNewDriver(Driver newDriver) {
     newDriver.setCab(matchingCab);
     //newDriver.setMap(this->dim);
     newDriver.setLocation(dim->getPtrGrid()[0]);
-    newDriver.setClock(this->time);
     this->drivers.push_back(newDriver);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
@@ -103,7 +102,7 @@ int TaxiCenter::timeIs() {
 void TaxiCenter::advanceTime() {
     this->time.advanceTime();
     for(int i=0; i< this->drivers.size(); i++){
-        drivers[i].advanceClockOfDriver();
+        //drivers[i].advanceClockOfDriver();
     }
 }
 
@@ -159,7 +158,7 @@ void TaxiCenter::moveAllDriversOneStep(Socket* udp) {
             this->setReceiveDataFlag(false);
         }
         if (this->drivers[i].getIsAvailable() == false) {
-            drivers[i].moveOneStep();
+            drivers[i].moveOneStep(this->timeIs());
 
             //serializing and sending new location of driver - to client
             NodePoint *newLocation = this->drivers[i].getLocationInGrid();
