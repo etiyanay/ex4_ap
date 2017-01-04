@@ -57,3 +57,10 @@ int Trip::passengersSendScore() {
 int Trip::getClockTimeTrip() {
     return this->clockTimeTrip;
 }
+void Trip::deleteTripInClient() {
+    //deleting the nodepoints in the path
+    int sizeOfTrip = path.size();
+    for (int i = 0; i < sizeOfTrip; ++i) {
+        delete path[i];
+    }
+}

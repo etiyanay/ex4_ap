@@ -120,6 +120,6 @@ public:
      * @return the time that the trip should start
      */
     int getClockTimeTrip();
-
+    void deleteTripInClient();
 };
 #endif //AP_EX1_TRIP_H

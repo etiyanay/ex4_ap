@@ -43,24 +43,36 @@ int main(int argc, char *argv[]) {
     //setting the cab to the driver
     newDriver->setCab(matchingCab);
     //endless loop for getting trips and GO advances- till we get "close" from server
+    Trip *newTrip = NULL;
+    bool ifDriverHasTrip = false;
     while (1) {
         udp.sendData("wait_for_a_trip");
         //getting the trip and diserializing it
         char buffer3[1024];
-        Trip *newTrip;
         udp.reciveData(buffer3, sizeof(buffer3));
         string serial_trip = bufferToString(buffer3, sizeof(buffer3));
         //if we get "close" - we release allocating memory and finish
         if (strcmp(serial_trip.data(), "close") ==0) {
+            if (ifDriverHasTrip) {
+                newDriver->deleteTripFromClient();
+            }
+            delete newTrip;
+            delete matchingCab;
+            if (newDriver->getLocationInGrid() != NULL)
+                newDriver->deleteLocationInClient();
             delete newDriver;
             return 0;
         }
+        delete newTrip;
         boost::iostreams::basic_array_source<char> device2(serial_trip.c_str(), serial_trip.size());
         boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(device2);
         boost::archive::binary_iarchive ia2(s3);
         ia2 >> newTrip;
         //setting the trip to the driver
+        if (ifDriverHasTrip)
+            newDriver->deleteTripFromClient();
         newDriver->setNewTrip(*newTrip);
+        ifDriverHasTrip = true;
         NodePoint *newLocation;
         int sizeOfTrip = newDriver->getTrip().getPath().size();
         //advance the driver to its next location in trip's path
@@ -71,6 +83,12 @@ int main(int argc, char *argv[]) {
             udp.reciveData(newLocationBuffer, sizeof(newLocationBuffer));
             string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
             if (strcmp(serial_location.data(), "close") ==0) {
+                //the driver already has a trip inside
+                newDriver->deleteTripFromClient();
+                delete newTrip;
+                delete matchingCab;
+                if (newDriver->getLocationInGrid() != NULL)
+                    newDriver->deleteLocationInClient();
                 delete newDriver;
                 return 0;
             }
@@ -78,6 +96,8 @@ int main(int argc, char *argv[]) {
             boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s4(device3);
             boost::archive::binary_iarchive ia3(s4);
             ia3 >> newLocation;
+            if (newDriver->getLocationInGrid() != NULL)
+                newDriver->deleteLocationInClient();
             newDriver->setLocation(newLocation);
             //if the cab is luxury- advance the driver 2 blocks
             if (newDriver->getCab()->getSpeed() == 2)
