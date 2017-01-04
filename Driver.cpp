@@ -58,13 +58,12 @@ int Driver::getId() {
 int Driver::getCabId() {
     return this->cabId;
 }
-bool Driver::setIsAvailable(bool flag) {
+void Driver::setIsAvailable(bool flag) {
     this->isAvailable = flag;
 }
 bool Driver::getIsAvailable() {
     return this->isAvailable;
 }
-
 void Driver::moveOneStep(int time){
     int pathIndex = time - (this->getTrip().getClockTimeTrip());
     int cabType = this->getCab()->getSpeed();

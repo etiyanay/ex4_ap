@@ -82,24 +82,35 @@ public:
      */
     void addNewTrip(Trip newTrip);
     /**
-     * the func make the drivers "drive" to their end points
-     */
-    void startDriving();
-    /**
-     * the func assigning the trips (by the order we get them) to the drivers
-     */
-    void assignTripsToDrivers();
-    /**
      * @return the num of trips in the taxi center
      */
     int getNumOfTrips();
+    /**
+     * advance the taxi clock time in 1
+     */
     void advanceTime();
+    /**
+     * @return the time of the taxi center
+     */
     int timeIs();
+    /**
+     * @param currentDriverIndex the index of the driver we are going to assign a trip to him
+     * @param udp the socket to send the trip to client through
+     */
     void assignTripToDriver(int currentDriverIndex, Socket* udp);
+    /**
+     * @param udp the socket to send the trip/new location to client through
+     */
     void moveAllDriversOneStep(Socket* udp);
+    /**
+     * the func change the flag to true if the taxi center has to process a new recieving data
+     * @param flag the new condition of the taxi center
+     */
     void setReceiveDataFlag(bool flag);
+    /**
+     * @return true if the taxi center is busy to get applies, else return false
+     */
     bool getReceiveDataFlag();
-
     };
 
 #endif //AP_EX1_TAXICENTER_H

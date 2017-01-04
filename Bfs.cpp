@@ -1,7 +1,6 @@
 #include "Bfs.h"
 #include <queue>
 
-
 using namespace std;
 
 Bfs::Bfs(Grid* currentGrid) {
@@ -37,7 +36,6 @@ NodePoint* Bfs::bfsAlgorithm(Point* startPoint, Point* destination) {
         }
     }
 }
-
 vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
     vector<NodePoint*> path;
     NodePoint* destinationP = this->bfsAlgorithm(startPoint, destination);

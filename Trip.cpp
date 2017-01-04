@@ -54,7 +54,6 @@ int Trip::passengersSendScore() {
     }
     return totalScore;
 }
-
 int Trip::getClockTimeTrip() {
     return this->clockTimeTrip;
 }

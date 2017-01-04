@@ -115,6 +115,10 @@ public:
      * @return the total sum of the satisfaction score from all the passengers in the current trip
      */
     int passengersSendScore();
+    /**
+     *
+     * @return the time that the trip should start
+     */
     int getClockTimeTrip();
 
 };

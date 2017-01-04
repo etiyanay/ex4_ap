@@ -21,7 +21,6 @@ Driver TaxiCenter::findClosestDriver(Point* sourcePoint) {
 void TaxiCenter::addNewDriver(Driver newDriver) {
     CabFactory* matchingCab = this->findCabById(newDriver.getCabId());
     newDriver.setCab(matchingCab);
-    //newDriver.setMap(this->dim);
     newDriver.setLocation(dim->getPtrGrid()[0]);
     this->drivers.push_back(newDriver);
 }
@@ -57,24 +56,6 @@ Point* TaxiCenter::findDriverLocationById(int id) {
             return this->drivers[i].getLocationInGrid()->getPoint();
     }
 }
-void TaxiCenter::assignTripsToDrivers() {
-    int i,j;
-    int numOfDrivers = getNumOfDrivers();
-    for(i = 0; i < numOfDrivers; i++) {
-        for(j = 0; j < getNumOfTrips(); j++) {
-            //check if the trip starts where the driver is
-            if (drivers[i].getLocationInGrid()->getPoint()->equals
-                    (trips[j].getPath()[0]->getPoint())) {
-                //attach the trip to the driver
-                this->drivers[i].setNewTrip(trips[j]);
-                //delete the trip that has been set to the driver
-                this->trips.erase(this->trips.begin() + j);
-                //step to the next driver
-                break;
-            }
-        }
-    }
-}
 void TaxiCenter::addNewTrip(Trip newTrip){
     vector <NodePoint*> path = this->currentBfs->runBfs(newTrip.getStartPoint(),
                                                         newTrip.getEndPoint());
@@ -83,33 +64,18 @@ void TaxiCenter::addNewTrip(Trip newTrip){
     this->dim->initializeGrid();
     this->trips.push_back(newTrip);
 }
-void TaxiCenter::startDriving() {
-    int i;
-    int numOfDrivers = this->getNumOfDrivers();
-    int sizeOfPath;
-    for (i = 0; i < numOfDrivers; i++) {
-        sizeOfPath = this->drivers[i].getTrip().getPath().size();
-        this->drivers[i].setLocation(this->drivers[i].getTrip().getPath()[sizeOfPath - 1]);
-    }
-}
 int TaxiCenter::timeIs() {
     return this->time.timeIs();
 }
-
 void TaxiCenter::advanceTime() {
     this->time.advanceTime();
-    for(int i=0; i< this->drivers.size(); i++){
-        //drivers[i].advanceClockOfDriver();
-    }
 }
-
 void TaxiCenter::setReceiveDataFlag(bool flag) {
     this->availableToReceiveData = flag;
 }
 bool TaxiCenter::getReceiveDataFlag(){
     return this->availableToReceiveData;
 }
-
 void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* udp) {
     int i, indexOfRelevantTrip = -1;
         for(i = 0; i < this->getNumOfTrips(); i++) {
@@ -133,7 +99,6 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* udp) {
         boost::archive::binary_oarchive oa(s);
         oa << newTrip;
         s.flush();
-
         //attach the trip to the driver
         this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
         //delete the trip that has been set to the driver
@@ -150,13 +115,12 @@ void TaxiCenter::moveAllDriversOneStep(Socket* udp) {
     for (i = 0; i < numOfDrivers; i++) {
         char buffer[1024];
         if (this->getReceiveDataFlag()) {
-            //receiveData- want trip/want go
+            //receiveData- we get "want trip" or "want go"
             udp->reciveData(buffer, sizeof(buffer));
             this->setReceiveDataFlag(false);
         }
         if (this->drivers[i].getIsAvailable() == false) {
             drivers[i].moveOneStep(this->timeIs());
-
             //serializing and sending new location of driver - to client
             NodePoint *newLocation = this->drivers[i].getLocationInGrid();
             string serial_driverNewLocation;
@@ -169,6 +133,7 @@ void TaxiCenter::moveAllDriversOneStep(Socket* udp) {
             this->setReceiveDataFlag(true);
 
         } else {
+            //if driver isn't on ride - check if it's time to assign him a trip
                 this->assignTripToDriver(i, udp);
         }
     }

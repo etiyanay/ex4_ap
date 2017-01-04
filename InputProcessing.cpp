@@ -13,7 +13,6 @@ using namespace boost::archive;
 string bufferToString(char* buffer, int bufflen)
 {
     string ret(buffer, bufflen);
-
     return ret;
 }
 string* stringPoints(string input) {
@@ -52,6 +51,7 @@ void createObstacles(Grid* map) {
     }
 }
 void insertDriver(TaxiCenter* station, Socket* udp) {
+    //getting driver from client and diseralizing it
     Driver *newDriver;
     char buffer2[1024];
     udp->reciveData(buffer2, sizeof(buffer2));
@@ -60,6 +60,7 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
     ia >> newDriver;
+    //addind the driver to the taxi center
     station->addNewDriver(*newDriver);
     //sending matching cab to client
     CabFactory* matchingCab;
@@ -71,7 +72,7 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     boost::archive::binary_oarchive oa(s);
     oa << matchingCab;
     s.flush();
-    //sending the serialized cab
+    //sending the serialized cab to the client
     udp->sendData(serial_str2);
 }
 void insertTrip(TaxiCenter* station) {
@@ -81,6 +82,7 @@ void insertTrip(TaxiCenter* station) {
     Point *source, *destination;
     Point2D p2DStart, p2DEnd;
     Trip newTrip;
+    //getting the trip from the console
     cin >> idOfTrip >> dummy >> xStartTrip >> dummy >> yStartTrip >> dummy >> xEndTrip >> dummy
         >> yEndTrip >> dummy >> numOfPassengerTrip >> dummy >> tariffTrip >> dummy >> clockTimeTrip;
     p2DStart = Point2D(xStartTrip, yStartTrip);
@@ -96,6 +98,7 @@ void insertCab(TaxiCenter* station) {
     int idOfCab, typeOfCab;
     char manufacturerOfCab, colorOfCab, dummy;
     CabFactory* newCab;
+    //getting the cab from console
     cin >> idOfCab >> dummy >> typeOfCab >> dummy >> manufacturerOfCab >> dummy >> colorOfCab;
     if (typeOfCab == 1) {
         newCab = new StandardCab(idOfCab, Manufacturer(manufacturerOfCab),
@@ -104,6 +107,7 @@ void insertCab(TaxiCenter* station) {
         newCab = new LuxuryCab(idOfCab, Manufacturer(manufacturerOfCab),
                                Color(colorOfCab));
     }
+    //adding it
     station->addNewCab(newCab);
 }
 void driverLocationRequest(TaxiCenter* station) {
@@ -116,6 +120,7 @@ void menu(TaxiCenter* station, Socket* udp) {
     cin >> extension;
     switch (extension) {
         case 1:
+            //getting num of drivers that we are going to get from clients
             cin >> numOfDrivers;
             insertDriver(station, udp);
             break;
@@ -133,6 +138,7 @@ void menu(TaxiCenter* station, Socket* udp) {
             station->moveAllDriversOneStep(udp);
             break;
         case 7:
+            //telling the clients to shutdown themselves
             udp->sendData("close");
             udp->closeData();
             delete udp;

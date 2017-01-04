@@ -69,6 +69,4 @@ public:
 };
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(CabFactory)
 
-
-
 #endif //AP_EX1_CABFACTORY_H

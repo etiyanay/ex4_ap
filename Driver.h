@@ -125,12 +125,21 @@ public:
      */
     int getId();
     /**
-     *
-     * @return
+     * @return id number of the cab
      */
     int getCabId();
-    bool setIsAvailable(bool flag);
+    /**
+     * @param flag is condition if driver is available
+     */
+    void setIsAvailable(bool flag);
+    /**
+     * @return if the driver available or not
+     */
     bool getIsAvailable();
+    /**
+     * the func advance the driver to its next location, based on the cab's type
+     * @param time is the time in taxi center's clock
+     */
     void moveOneStep(int time);
 };
 
