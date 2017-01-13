@@ -21,10 +21,10 @@ using namespace std;
 #define ERROR_SOCKET 1
 #define ERROR_BIND 2
 #define ERROR_LISTEN 3
-#define ERROR_CONNECT 4
+#define ERROR_CONNECT -1
 #define ERROR_SEND 5
 #define ERROR_RECIVE 6
-#define ERROR_ACCEPT 7
+#define ERROR_ACCEPT -1
 #define CONNECTION_CLOSED 8
 
 #define IP "127.0.0.1"
@@ -43,47 +43,45 @@ protected:
 	int port_number;
 public:
 	/***********************************************************************
-	* function name: Socket												   *
-	* The Input: none													   *
-	* The output: none										               *
-	* The Function operation: creating new Socket object			       *
-	***********************************************************************/
+    * function name: Socket												   *
+    * The Input: none													   *
+    * The output: none										               *
+    * The Function operation: creating new Socket object			       *
+    ***********************************************************************/
 	Socket();
 	/***********************************************************************
-	* function name: ~Socket											   *
-	* The Input: none													   *
-	* The output: none										               *
-	* The Function operation: default destructor					       *
-	***********************************************************************/
+    * function name: ~Socket											   *
+    * The Input: none													   *
+    * The output: none										               *
+    * The Function operation: default destructor					       *
+    ***********************************************************************/
 	virtual ~Socket();
 	/***********************************************************************
-	* function name: initialize											   *
-	* The Input: none              										   *
-	* The output: int number representing the return status		           *
-	* The Function operation: initialize the Socket object and getting a   *
-	* socket descriptor. pure virtual method							   *
-	***********************************************************************/
+    * function name: initialize											   *
+    * The Input: none              										   *
+    * The output: int number representing the return status		           *
+    * The Function operation: initialize the Socket object and getting a   *
+    * socket descriptor. pure virtual method							   *
+    ***********************************************************************/
 	virtual int initialize() = 0;
 	/***********************************************************************
-	* function name: sendData											   *
-	* The Input: string representing the data to send		               *
-	* The output: int number representing the return status		           *
-	* The Function operation: sending the input data to the socket         *
-	* who connect to this socket. pure virtual method					   *
-	***********************************************************************/
-	virtual int sendData(string data) = 0;
+    * function name: sendData											   *
+    * The Input: string representing the data to send		               *
+    * The output: int number representing the return status		           *
+    * The Function operation: sending the input data to the socket         *
+    * who connect to this socket. pure virtual method					   *
+    ***********************************************************************/
+	virtual int sendData(string data, int descriptor) = 0;
 	/***********************************************************************
-	* function name: recive	`											   *
-	* The Input: none										               *
-	* The output: int number representing the return status	               *
-	* The Function operation: getting data from the other socket and print *
-	* the data															   *
-	***********************************************************************/
-	virtual int reciveData(char* buffer, int size) = 0;
+    * function name: recive	`											   *
+    * The Input: none										               *
+    * The output: int number representing the return status	               *
+    * The Function operation: getting data from the other socket and print *
+    * the data															   *
+    ***********************************************************************/
+	virtual int reciveData(char* buffer, int size, int descriptor) = 0;
+	virtual int tcpAccept() = 0;
 	virtual int closeData()=0;
-
-
-
 };
 
 #endif /* SOCKET_H_ */

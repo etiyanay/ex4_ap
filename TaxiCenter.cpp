@@ -76,7 +76,7 @@ void TaxiCenter::setReceiveDataFlag(bool flag) {
 bool TaxiCenter::getReceiveDataFlag(){
     return this->availableToReceiveData;
 }
-void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* udp) {
+void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     int i, indexOfRelevantTrip = -1;
         for(i = 0; i < this->getNumOfTrips(); i++) {
             //check if the trip starts where the driver is
@@ -84,8 +84,12 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* udp) {
                     (trips[i].getPath()[0]->getPoint())) &&
                     ((this->trips[i].getClockTimeTrip() == this->timeIs()))) {
                 indexOfRelevantTrip = i;
+                break;
             }
+            cout << "still in for " << indexOfRelevantTrip << endl;
     }
+    cout << "after for for " << indexOfRelevantTrip << endl;
+
     //if we did find a correct trip - assign it
     if (indexOfRelevantTrip != -1) {
         //serializing
@@ -105,18 +109,18 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* udp) {
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
         this->drivers[currentDriverIndex].setIsAvailable(false);
         //sending the serialized cab to client
-        udp->sendData(serial_trip);
+        tcp->sendData(serial_trip, this->clientsSd[currentDriverIndex]);
         this->setReceiveDataFlag(true);
     }
 }
-void TaxiCenter::moveAllDriversOneStep(Socket* udp) {
+void TaxiCenter::moveAllDriversOneStep(Socket* tcp) {
     int i;
     int numOfDrivers = this->getNumOfDrivers();
     for (i = 0; i < numOfDrivers; i++) {
         char buffer[1024];
         if (this->getReceiveDataFlag()) {
             //receiveData- we get "want trip" or "want go"
-            udp->reciveData(buffer, sizeof(buffer));
+            tcp->reciveData(buffer, sizeof(buffer), this->clientsSd[i]);
             this->setReceiveDataFlag(false);
         }
         if (this->drivers[i].getIsAvailable() == false) {
@@ -129,12 +133,22 @@ void TaxiCenter::moveAllDriversOneStep(Socket* udp) {
             boost::archive::binary_oarchive oa(s);
             oa << newLocation;
             s.flush();
-            udp->sendData(serial_driverNewLocation);
+            tcp->sendData(serial_driverNewLocation, this->clientsSd[i]);
             this->setReceiveDataFlag(true);
 
         } else {
             //if driver isn't on ride - check if it's time to assign him a trip
-                this->assignTripToDriver(i, udp);
+                this->assignTripToDriver(i, tcp);
         }
     }
+}
+
+void TaxiCenter::sendCloseToClients(Socket *tcp) {
+    int sizeOfClients = this->clientsSd.size();
+    for (int i = 0; i < sizeOfClients; ++i) {
+        tcp->sendData("close", this->clientsSd[i]);
+    }
+}
+void TaxiCenter::setNewClientSd(int newClientSd) {
+    this->clientsSd.push_back(newClientSd);
 }

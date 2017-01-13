@@ -1,6 +1,7 @@
 #include "Udp.h"
 #include "Driver.h"
 #include "InputProcessing.h"
+#include "Tcp.h"
 #include <boost/serialization/export.hpp>
 BOOST_CLASS_EXPORT_GUID(Point,"Point");
 BOOST_CLASS_EXPORT_GUID(CabFactory,"CabFactory");
@@ -9,8 +10,8 @@ using namespace std;
 using namespace boost::archive;
 
 int main(int argc, char *argv[]) {
-    Udp udp(argv[1], atoi(argv[2]));
-    udp.initialize();
+    Tcp tcp(0, atoi(argv[2]));
+    tcp.initialize();
 //
     char buffer[1024];
     int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
@@ -30,11 +31,11 @@ int main(int argc, char *argv[]) {
     oa << newDriver;
     s.flush();
     //sending the serialized driver
-    udp.sendData(serial_str);
+    tcp.sendData(serial_str, 0);
     //getting the cab and diserializing it
     char buffer2[1024];
     CabFactory* matchingCab;
-    udp.reciveData(buffer2, sizeof(buffer2));
+    tcp.reciveData(buffer2, sizeof(buffer2), 0);
     string serial_str2 = bufferToString(buffer2, sizeof(buffer2));
     boost::iostreams::basic_array_source<char> device(serial_str2.c_str(), serial_str2.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
@@ -46,10 +47,10 @@ int main(int argc, char *argv[]) {
     Trip *newTrip = NULL;
     bool ifDriverHasTrip = false;
     while (1) {
-        udp.sendData("wait_for_a_trip");
+        tcp.sendData("wait_for_a_trip", 0);
         //getting the trip and diserializing it
         char buffer3[1024];
-        udp.reciveData(buffer3, sizeof(buffer3));
+        tcp.reciveData(buffer3, sizeof(buffer3), 0);
         string serial_trip = bufferToString(buffer3, sizeof(buffer3));
         //if we get "close" - we release allocating memory and finish
         if (strcmp(serial_trip.data(), "close") ==0) {
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]) {
             if (newDriver->getLocationInGrid() != NULL)
                 newDriver->deleteLocationInClient();
             delete newDriver;
+            tcp.closeData();
             return 0;
         }
         delete newTrip;
@@ -77,10 +79,10 @@ int main(int argc, char *argv[]) {
         int sizeOfTrip = newDriver->getTrip().getPath().size();
         //advance the driver to its next location in trip's path
         for (int i = 1; i < sizeOfTrip; ++i) {
-            udp.sendData("wait_for_GO");
+            tcp.sendData("wait_for_GO", 0);
             //getting driver's new location and diseralizing it
             char newLocationBuffer[1024];
-            udp.reciveData(newLocationBuffer, sizeof(newLocationBuffer));
+            tcp.reciveData(newLocationBuffer, sizeof(newLocationBuffer), 0);
             string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
             if (strcmp(serial_location.data(), "close") ==0) {
                 //the driver already has a trip inside
@@ -90,6 +92,7 @@ int main(int argc, char *argv[]) {
                 if (newDriver->getLocationInGrid() != NULL)
                     newDriver->deleteLocationInClient();
                 delete newDriver;
+                tcp.closeData();
                 return 0;
             }
             boost::iostreams::basic_array_source<char> device3(serial_location.c_str(), serial_location.size());

@@ -2,15 +2,15 @@
 #include "TwoDim.h"
 #include "Bfs.h"
 #include "InputProcessing.h"
-#include "Udp.h"
+#include "Tcp.h"
 //#include <gtest/gtest.h>
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
     //server commands
-    Socket* udp = new Udp(1, atoi(argv[1]));
-    udp->initialize();
+    Socket* tcp = new Tcp(1, atoi(argv[1]));
+    tcp->initialize();
     //initialize taxi center
     int xGrid, yGrid;
     cin >> xGrid >> yGrid;
@@ -21,6 +21,6 @@ int main(int argc, char* argv[]) {
     createObstacles(map);
     //running menu
     while (1) {
-        menu(station, udp);
+        menu(station, tcp);
     }
 }

@@ -50,11 +50,11 @@ void createObstacles(Grid* map) {
         delete obstacle;
     }
 }
-void insertDriver(TaxiCenter* station, Socket* udp) {
+void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     //getting driver from client and diseralizing it
     Driver *newDriver;
     char buffer2[1024];
-    udp->reciveData(buffer2, sizeof(buffer2));
+    tcp->reciveData(buffer2, sizeof(buffer2), newClientSd);
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
@@ -73,7 +73,7 @@ void insertDriver(TaxiCenter* station, Socket* udp) {
     oa << matchingCab;
     s.flush();
     //sending the serialized cab to the client
-    udp->sendData(serial_str2);
+    tcp->sendData(serial_str2, newClientSd);
 }
 void insertTrip(TaxiCenter* station) {
     int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip, clockTimeTrip;
@@ -115,14 +115,18 @@ void driverLocationRequest(TaxiCenter* station) {
     cin >> idOfDriver;
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
-void menu(TaxiCenter* station, Socket* udp) {
+void menu(TaxiCenter* station, Socket* tcp) {
     int extension, numOfDrivers;
     cin >> extension;
     switch (extension) {
         case 1:
             //getting num of drivers that we are going to get from clients
             cin >> numOfDrivers;
-            insertDriver(station, udp);
+            for (int i = 0; i < numOfDrivers; ++i) {
+                int newClientSd = tcp->tcpAccept();
+                station->setNewClientSd(newClientSd);
+                insertDriver(station, tcp, newClientSd);
+            }
             break;
         case 2:
             insertTrip(station);
@@ -135,13 +139,13 @@ void menu(TaxiCenter* station, Socket* udp) {
             break;
         case 9:
             station->advanceTime();
-            station->moveAllDriversOneStep(udp);
+            station->moveAllDriversOneStep(tcp);
             break;
         case 7:
             //telling the clients to shutdown themselves
-            udp->sendData("close");
-            udp->closeData();
-            delete udp;
+            station->sendCloseToClients(tcp);
+            tcp->closeData();
+            delete tcp;
             delete station;
             exit(0);
         default:

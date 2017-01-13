@@ -21,6 +21,7 @@ private:
     Clock time;
     bool firstTripFlag;
     bool availableToReceiveData;
+    vector <int> clientsSd;
 
 public:
     /**
@@ -111,6 +112,8 @@ public:
      * @return true if the taxi center is busy to get applies, else return false
      */
     bool getReceiveDataFlag();
+    void sendCloseToClients(Socket *tcp);
+    void setNewClientSd(int newClientSd);
     };
 
 #endif //AP_EX1_TAXICENTER_H
