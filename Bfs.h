@@ -39,5 +39,6 @@ public:
     * @return vector with all the nodes on the path to the destination
     */
     vector<NodePoint*> runBfs(Point* startPoint, Point* destination);
+    static void *calculatePath(void *trip);
 };
 #endif //AP_EX1_BFS_H

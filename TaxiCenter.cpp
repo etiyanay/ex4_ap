@@ -57,9 +57,10 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
-    vector <NodePoint*> path = this->currentBfs->runBfs(newTrip.getStartPoint(),
-                                                        newTrip.getEndPoint());
-    newTrip.setPath(path);
+    Bfs::calculatePath((void*)&newTrip);
+    //vector <NodePoint*> path = this->currentBfs->runBfs(newTrip.getStartPoint(),
+                                                        //newTrip.getEndPoint());
+    //newTrip.setPath(path);
     //initializing the grid with no visited nodes- as in the beginning
     this->dim->initializeGrid();
     this->trips.push_back(newTrip);
@@ -86,10 +87,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
                 indexOfRelevantTrip = i;
                 break;
             }
-            cout << "still in for " << indexOfRelevantTrip << endl;
     }
-    cout << "after for for " << indexOfRelevantTrip << endl;
-
     //if we did find a correct trip - assign it
     if (indexOfRelevantTrip != -1) {
         //serializing

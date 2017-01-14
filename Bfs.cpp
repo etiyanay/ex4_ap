@@ -1,4 +1,5 @@
 #include "Bfs.h"
+#include "Trip.h"
 #include <queue>
 
 using namespace std;
@@ -52,4 +53,11 @@ vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
         pathByOrder.push_back(path[i]);
     }
     return pathByOrder;
+}
+static void* Bfs::calculatePath(void *trip) {
+    Trip newTrip = *((Trip*)trip);
+    Point *start = newTrip.getStartPoint();
+    Point *end = newTrip.getEndPoint();
+    vector<NodePoint*> path = this->runBfs(start,end);
+    ((Trip*)trip)->setPath(path);
 }
