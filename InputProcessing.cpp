@@ -144,7 +144,7 @@ void menu(TaxiCenter* station, Socket* tcp) {
         case 7:
             //telling the clients to shutdown themselves
             station->sendCloseToClients(tcp);
-            tcp->closeData();
+            //tcp->closeData();
             delete tcp;
             delete station;
             exit(0);

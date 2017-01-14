@@ -7,7 +7,6 @@ TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->currentBfs = currentBfs;
     this->time = Clock(0);
     this->firstTripFlag = false;
-    this->availableToReceiveData = true;
 }
 TaxiCenter::~TaxiCenter() {
     delete this->dim;
@@ -23,6 +22,7 @@ void TaxiCenter::addNewDriver(Driver newDriver) {
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
     this->drivers.push_back(newDriver);
+    this->availableToReceiveData.push_back(true);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
     this->cabs.push_back(newCab);
@@ -70,11 +70,11 @@ int TaxiCenter::timeIs() {
 void TaxiCenter::advanceTime() {
     this->time.advanceTime();
 }
-void TaxiCenter::setReceiveDataFlag(bool flag) {
-    this->availableToReceiveData = flag;
+void TaxiCenter::setReceiveDataFlag(bool flag, int driverIndex) {
+    this->availableToReceiveData[driverIndex] = flag;
 }
-bool TaxiCenter::getReceiveDataFlag(){
-    return this->availableToReceiveData;
+bool TaxiCenter::getReceiveDataFlag(int driverIndex){
+    return this->availableToReceiveData[driverIndex];
 }
 void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     int i, indexOfRelevantTrip = -1;
@@ -110,7 +110,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         this->drivers[currentDriverIndex].setIsAvailable(false);
         //sending the serialized cab to client
         tcp->sendData(serial_trip, this->clientsSd[currentDriverIndex]);
-        this->setReceiveDataFlag(true);
+        this->setReceiveDataFlag(true, currentDriverIndex);
     }
 }
 void TaxiCenter::moveAllDriversOneStep(Socket* tcp) {
@@ -118,10 +118,10 @@ void TaxiCenter::moveAllDriversOneStep(Socket* tcp) {
     int numOfDrivers = this->getNumOfDrivers();
     for (i = 0; i < numOfDrivers; i++) {
         char buffer[1024];
-        if (this->getReceiveDataFlag()) {
+        if (this->getReceiveDataFlag(i)) {
             //receiveData- we get "want trip" or "want go"
             tcp->reciveData(buffer, sizeof(buffer), this->clientsSd[i]);
-            this->setReceiveDataFlag(false);
+            this->setReceiveDataFlag(false,i);
         }
         if (this->drivers[i].getIsAvailable() == false) {
             drivers[i].moveOneStep(this->timeIs());
@@ -134,7 +134,7 @@ void TaxiCenter::moveAllDriversOneStep(Socket* tcp) {
             oa << newLocation;
             s.flush();
             tcp->sendData(serial_driverNewLocation, this->clientsSd[i]);
-            this->setReceiveDataFlag(true);
+            this->setReceiveDataFlag(true,i);
 
         } else {
             //if driver isn't on ride - check if it's time to assign him a trip

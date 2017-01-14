@@ -20,7 +20,7 @@ private:
     Grid* dim;
     Clock time;
     bool firstTripFlag;
-    bool availableToReceiveData;
+    vector <bool> availableToReceiveData;
     vector <int> clientsSd;
 
 public:
@@ -107,11 +107,11 @@ public:
      * the func change the flag to true if the taxi center has to process a new recieving data
      * @param flag the new condition of the taxi center
      */
-    void setReceiveDataFlag(bool flag);
+    void setReceiveDataFlag(bool flag,int driverIndex);
     /**
      * @return true if the taxi center is busy to get applies, else return false
      */
-    bool getReceiveDataFlag();
+    bool getReceiveDataFlag(int driverIndex);
     void sendCloseToClients(Socket *tcp);
     void setNewClientSd(int newClientSd);
     };
