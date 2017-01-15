@@ -60,4 +60,5 @@ void createObstacles(Grid* map);
  */
 string bufferToString(char* buffer, int bufflen);
 
+
 #endif //AP_EX1_INPUTPROCESSING_H

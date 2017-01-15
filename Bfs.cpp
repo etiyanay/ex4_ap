@@ -1,6 +1,7 @@
 #include "Bfs.h"
 #include "Trip.h"
 #include <queue>
+#include "TaxiCenter.h"
 
 using namespace std;
 
@@ -54,10 +55,16 @@ vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
     }
     return pathByOrder;
 }
-static void* Bfs::calculatePath(void *trip) {
-    Trip newTrip = *((Trip*)trip);
-    Point *start = newTrip.getStartPoint();
-    Point *end = newTrip.getEndPoint();
-    vector<NodePoint*> path = this->runBfs(start,end);
-    ((Trip*)trip)->setPath(path);
+void* Bfs::calculatePath(void *element) {
+    TripData* data = (TripData*)element;
+
+    //Trip newTrip = *((Trip*)trip);
+    Point *start = data->trip->getStartPoint();
+    Point *end = data->trip->getEndPoint();
+    //vector<NodePoint*> path = this->runBfs(start,end);
+
+    data->trip->setPath(data->bfs->runBfs(start,end));
+
+    //return (void*)&path;
+    //((Trip*)trip)->setPath(path);
 }

@@ -57,13 +57,17 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
-    Bfs::calculatePath((void*)&newTrip);
-    //vector <NodePoint*> path = this->currentBfs->runBfs(newTrip.getStartPoint(),
-                                                        //newTrip.getEndPoint());
-    //newTrip.setPath(path);
+    this->trips.push_back(newTrip);
+    TripData *data = new TripData();
+    data->trip = &(this->trips[this->trips.size()-1]);
+    data->bfs = this->currentBfs;
+
+    //pthread_create(&threadA[noThread], NULL, Bfs::calculatePath, (void*)data);
+
+    Bfs::calculatePath((void*)data);
     //initializing the grid with no visited nodes- as in the beginning
     this->dim->initializeGrid();
-    this->trips.push_back(newTrip);
+
 }
 int TaxiCenter::timeIs() {
     return this->time.timeIs();

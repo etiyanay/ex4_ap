@@ -115,5 +115,10 @@ public:
     void sendCloseToClients(Socket *tcp);
     void setNewClientSd(int newClientSd);
     };
+struct TripData
+{
+    Trip *trip;
+    Bfs *bfs;
+};
 
 #endif //AP_EX1_TAXICENTER_H
