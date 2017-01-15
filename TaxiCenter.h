@@ -22,6 +22,8 @@ private:
     bool firstTripFlag;
     vector <bool> availableToReceiveData;
     vector <int> clientsSd;
+    pthread_mutex_t calculatePath;
+    int numOfMutex;
 
 public:
     /**
@@ -119,6 +121,7 @@ struct TripData
 {
     Trip *trip;
     Bfs *bfs;
+    //pthread_mutex_t mutex;
 };
 
 #endif //AP_EX1_TAXICENTER_H

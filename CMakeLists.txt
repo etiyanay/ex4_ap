@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.3)
 project(ap_ex1)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++0x")
 
 set(SOURCE_FILES Grid.cpp Grid.h NodePoint.cpp NodePoint.h Point.cpp Point.h Point2D.cpp Point2D.h TwoDim.cpp
         TwoDim.h Bfs.cpp Bfs.h InputProcessing.cpp InputProcessing.h Passenger.cpp Passenger.h Trip.cpp Trip.h

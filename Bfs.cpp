@@ -4,9 +4,13 @@
 #include "TaxiCenter.h"
 
 using namespace std;
+pthread_mutex_t myMutex;
+
 
 Bfs::Bfs(Grid* currentGrid) {
     this->currentGrid = currentGrid;
+    pthread_mutex_init(&myMutex,0);
+
 }
 Bfs::~Bfs() {
     delete this->currentGrid;
@@ -56,14 +60,23 @@ vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
     return pathByOrder;
 }
 void* Bfs::calculatePath(void *element) {
-    TripData* data = (TripData*)element;
 
+    pthread_mutex_lock(&myMutex);
+
+    //pthread_mutex_lock(&((TripData*)element)->mutex);
+    TripData* data = (TripData*)element;
+    cout << "the trip is:  " << data->trip->getId() << endl;
     //Trip newTrip = *((Trip*)trip);
     Point *start = data->trip->getStartPoint();
     Point *end = data->trip->getEndPoint();
     //vector<NodePoint*> path = this->runBfs(start,end);
 
     data->trip->setPath(data->bfs->runBfs(start,end));
+    data->bfs->currentGrid->initializeGrid();
+
+   pthread_mutex_unlock(&myMutex);
+
+    //mutex unlock
 
     //return (void*)&path;
     //((Trip*)trip)->setPath(path);

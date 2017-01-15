@@ -14,6 +14,7 @@ using namespace std;
 class Bfs {
 private:
     Grid* currentGrid;
+    //pthread_mutex_t myMutex;
 public:
     Bfs(){};
     /**

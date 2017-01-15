@@ -1,14 +1,19 @@
 #include "TaxiCenter.h"
 
 using namespace std;
+vector <pthread_t> tripsThreads;
+
 
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
     this->time = Clock(0);
     this->firstTripFlag = false;
+    this->numOfMutex = 0;
+
 }
 TaxiCenter::~TaxiCenter() {
+    pthread_mutex_destroy(&this->calculatePath);
     delete this->dim;
     for (int i = 0; i < this->cabs.size(); ++i) {
         delete this->cabs[i];
@@ -57,16 +62,27 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
+
     this->trips.push_back(newTrip);
+    /*if (this->numOfMutex == 0){
+        pthread_mutex_init(&this->calculatePath,0);
+        this->numOfMutex++;
+    }*/
     TripData *data = new TripData();
+    //change
     data->trip = &(this->trips[this->trips.size()-1]);
     data->bfs = this->currentBfs;
+    //data->mutex = this->calculatePath;
+    //resize
+    tripsThreads.resize(tripsThreads.size() + 1);
+    //create new thread that runs the calculatePath func
+    cout<<"before thread"<<endl;
+    pthread_create(&(tripsThreads[tripsThreads.size()-1]), NULL, Bfs::calculatePath,(void*)data);
+    cout<<"after thread"<<endl;
 
-    //pthread_create(&threadA[noThread], NULL, Bfs::calculatePath, (void*)data);
-
-    Bfs::calculatePath((void*)data);
     //initializing the grid with no visited nodes- as in the beginning
-    this->dim->initializeGrid();
+
+
 
 }
 int TaxiCenter::timeIs() {
