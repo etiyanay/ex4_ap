@@ -10,9 +10,9 @@ pthread_mutex_t myMutex;
 Bfs::Bfs(Grid* currentGrid) {
     this->currentGrid = currentGrid;
     pthread_mutex_init(&myMutex,0);
-
 }
 Bfs::~Bfs() {
+    pthread_mutex_destroy(&myMutex);
     delete this->currentGrid;
 }
 NodePoint* Bfs::bfsAlgorithm(Point* startPoint, Point* destination) {
@@ -25,8 +25,10 @@ NodePoint* Bfs::bfsAlgorithm(Point* startPoint, Point* destination) {
     while (!nodesQueue.empty()) {
         NodePoint* tempNode = nodesQueue.front();
         nodesQueue.pop();
-        if (tempNode->getPoint()->equals(destination))
+        if (tempNode->getPoint()->equals(destination)){
             return tempNode;
+
+        }
         vector<Point*>neighbors = this->currentGrid->neighborsPoints(tempNode->getPoint());
         int i;
         //for each neighbor, check if wasn't visited and set as visited and insert to the queue
@@ -62,6 +64,7 @@ vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
 void* Bfs::calculatePath(void *element) {
 
     pthread_mutex_lock(&myMutex);
+    cout<<"before thread"<<endl;
 
     //pthread_mutex_lock(&((TripData*)element)->mutex);
     TripData* data = (TripData*)element;
@@ -73,11 +76,10 @@ void* Bfs::calculatePath(void *element) {
 
     data->trip->setPath(data->bfs->runBfs(start,end));
     data->bfs->currentGrid->initializeGrid();
+    cout<<"after thread"<<endl;
 
    pthread_mutex_unlock(&myMutex);
 
     //mutex unlock
 
-    //return (void*)&path;
-    //((Trip*)trip)->setPath(path);
 }

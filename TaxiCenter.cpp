@@ -9,11 +9,12 @@ TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->currentBfs = currentBfs;
     this->time = Clock(0);
     this->firstTripFlag = false;
-    this->numOfMutex = 0;
+    //pthread_mutex_init(&list,0);
+    //this->numOfMutex = 0;
 
 }
 TaxiCenter::~TaxiCenter() {
-    pthread_mutex_destroy(&this->calculatePath);
+    //pthread_mutex_destroy(&list);
     delete this->dim;
     for (int i = 0; i < this->cabs.size(); ++i) {
         delete this->cabs[i];
@@ -62,23 +63,23 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
+    //pthread_mutex_lock(&list);
 
     this->trips.push_back(newTrip);
-    /*if (this->numOfMutex == 0){
-        pthread_mutex_init(&this->calculatePath,0);
-        this->numOfMutex++;
-    }*/
     TripData *data = new TripData();
-    //change
-    data->trip = &(this->trips[this->trips.size()-1]);
+    int size = this->trips.size();
+    data->trip = &(this->trips[size-1]);
     data->bfs = this->currentBfs;
     //data->mutex = this->calculatePath;
     //resize
     tripsThreads.resize(tripsThreads.size() + 1);
     //create new thread that runs the calculatePath func
-    cout<<"before thread"<<endl;
     pthread_create(&(tripsThreads[tripsThreads.size()-1]), NULL, Bfs::calculatePath,(void*)data);
-    cout<<"after thread"<<endl;
+    //pthread_mutex_unlock(&list);
+
+    for (int i = 0; i < tripsThreads.size(); ++i) {
+        pthread_join(tripsThreads[i], NULL);
+    }
 
     //initializing the grid with no visited nodes- as in the beginning
 
@@ -135,7 +136,7 @@ void TaxiCenter::moveAllDriversOneStep(Socket* tcp) {
     int i;
     int numOfDrivers = this->getNumOfDrivers();
     for (i = 0; i < numOfDrivers; i++) {
-        char buffer[1024];
+        char buffer[8096];
         if (this->getReceiveDataFlag(i)) {
             //receiveData- we get "want trip" or "want go"
             tcp->reciveData(buffer, sizeof(buffer), this->clientsSd[i]);

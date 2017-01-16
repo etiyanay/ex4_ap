@@ -5,10 +5,16 @@
 #include "TaxiCenter.h"
 #include "StandardCab.h"
 #include "LuxuryCab.h"
+#include "InputProcessing.h"
 #include <boost/serialization/export.hpp>
 
 using namespace std;
 using namespace boost::archive;
+
+vector <pthread_t> clientsThreads;
+pthread_mutex_t addDriverMutex;
+int numOfClientsThreads = 0;
+
 
 string bufferToString(char* buffer, int bufflen)
 {
@@ -51,9 +57,13 @@ void createObstacles(Grid* map) {
     }
 }
 void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
+    if (numOfClientsThreads == 0) {
+        pthread_mutex_init(&addDriverMutex,0);
+        numOfClientsThreads++;
+    }
     //getting driver from client and diseralizing it
     Driver *newDriver;
-    char buffer2[1024];
+    char buffer2[8096];
     tcp->reciveData(buffer2, sizeof(buffer2), newClientSd);
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
@@ -61,7 +71,9 @@ void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     boost::archive::binary_iarchive ia(s2);
     ia >> newDriver;
     //addind the driver to the taxi center
+    pthread_mutex_lock(&addDriverMutex);
     station->addNewDriver(*newDriver);
+    pthread_mutex_unlock(&addDriverMutex);
     //sending matching cab to client
     CabFactory* matchingCab;
     matchingCab = station->findCabById(newDriver->getCabId());
@@ -120,12 +132,22 @@ void menu(TaxiCenter* station, Socket* tcp) {
     cin >> extension;
     switch (extension) {
         case 1:
+            cout << "before getting num of clients" << endl;
             //getting num of drivers that we are going to get from clients
             cin >> numOfDrivers;
             for (int i = 0; i < numOfDrivers; ++i) {
+                cout << "ready for accepting" << endl;
                 int newClientSd = tcp->tcpAccept();
                 station->setNewClientSd(newClientSd);
-                insertDriver(station, tcp, newClientSd);
+                ClientData *newClient = new ClientData();
+                newClient->clientSd = newClientSd;
+                newClient->station = station;
+                newClient->tcp = tcp;
+                clientsThreads.resize(clientsThreads.size() + 1);
+                int size = clientsThreads.size();
+                pthread_create(&(clientsThreads[size-1]), NULL, manageClient,(void*)newClient);
+
+                //insertDriver(station, tcp, newClientSd);
             }
             break;
         case 2:
@@ -142,6 +164,8 @@ void menu(TaxiCenter* station, Socket* tcp) {
             station->moveAllDriversOneStep(tcp);
             break;
         case 7:
+            pthread_mutex_destroy(&addDriverMutex);
+
             //telling the clients to shutdown themselves
             station->sendCloseToClients(tcp);
             //tcp->closeData();
@@ -150,5 +174,13 @@ void menu(TaxiCenter* station, Socket* tcp) {
             exit(0);
         default:
             break;
+    }
+}
+
+void *manageClient(void* element) {
+    ClientData *data = (ClientData*)element;
+    insertDriver(data->station, data->tcp, data->clientSd);
+    for (int i = 0; i < clientsThreads.size(); ++i) {
+        pthread_join(clientsThreads[i], NULL);
     }
 }

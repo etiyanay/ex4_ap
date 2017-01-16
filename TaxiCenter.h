@@ -22,9 +22,8 @@ private:
     bool firstTripFlag;
     vector <bool> availableToReceiveData;
     vector <int> clientsSd;
-    pthread_mutex_t calculatePath;
+    pthread_mutex_t list;
     int numOfMutex;
-
 public:
     /**
      * default constructor

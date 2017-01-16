@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     Tcp tcp(0, atoi(argv[2]));
     tcp.initialize();
 //
-    char buffer[1024];
+    char buffer[8096];
     int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
     char statusOfDriver, dummy;
     Driver *newDriver;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     //sending the serialized driver
     tcp.sendData(serial_str, 0);
     //getting the cab and diserializing it
-    char buffer2[1024];
+    char buffer2[8096];
     CabFactory* matchingCab;
     tcp.reciveData(buffer2, sizeof(buffer2), 0);
     string serial_str2 = bufferToString(buffer2, sizeof(buffer2));
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         tcp.sendData("wait_for_a_trip", 0);
         //getting the trip and diserializing it
-        char buffer3[1024];
+        char buffer3[8096];
         tcp.reciveData(buffer3, sizeof(buffer3), 0);
         string serial_trip = bufferToString(buffer3, sizeof(buffer3));
         //if we get "close" - we release allocating memory and finish
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         for (int i = 1; i < sizeOfTrip; ++i) {
             tcp.sendData("wait_for_GO", 0);
             //getting driver's new location and diseralizing it
-            char newLocationBuffer[1024];
+            char newLocationBuffer[8096];
             tcp.reciveData(newLocationBuffer, sizeof(newLocationBuffer), 0);
             string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
             if (strcmp(serial_location.data(), "close") ==0) {

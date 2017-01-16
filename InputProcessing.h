@@ -59,6 +59,11 @@ void createObstacles(Grid* map);
  * @return a new string
  */
 string bufferToString(char* buffer, int bufflen);
-
+void *manageClient(void* element);
+struct ClientData {
+    TaxiCenter* station;
+    Socket *tcp;
+    int clientSd;
+};
 
 #endif //AP_EX1_INPUTPROCESSING_H
