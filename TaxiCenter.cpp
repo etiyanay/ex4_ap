@@ -23,12 +23,12 @@ TaxiCenter::~TaxiCenter() {
 Driver TaxiCenter::findClosestDriver(Point* sourcePoint) {
     //default id
 }
-void TaxiCenter::addNewDriver(Driver newDriver) {
+void TaxiCenter::addNewDriver(Driver newDriver, int index) {
     CabFactory* matchingCab = this->findCabById(newDriver.getCabId());
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
-    this->drivers.push_back(newDriver);
-    this->availableToReceiveData.push_back(true);
+    this->drivers[index] = newDriver;
+    this->availableToReceiveData[index] = true;
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
     this->cabs.push_back(newCab);
@@ -132,32 +132,30 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         this->setReceiveDataFlag(true, currentDriverIndex);
     }
 }
-void TaxiCenter::moveAllDriversOneStep(Socket* tcp) {
-    int i;
+void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
     int numOfDrivers = this->getNumOfDrivers();
-    for (i = 0; i < numOfDrivers; i++) {
         char buffer[8096];
-        if (this->getReceiveDataFlag(i)) {
+        if (this->getReceiveDataFlag(index)) {
             //receiveData- we get "want trip" or "want go"
-            tcp->reciveData(buffer, sizeof(buffer), this->clientsSd[i]);
-            this->setReceiveDataFlag(false,i);
+            tcp->reciveData(buffer, sizeof(buffer), this->clientsSd[index]);
+            this->setReceiveDataFlag(false,index);
         }
-        if (this->drivers[i].getIsAvailable() == false) {
-            drivers[i].moveOneStep(this->timeIs());
+        if (this->drivers[index].getIsAvailable() == false) {
+            drivers[index].moveOneStep(this->timeIs());
             //serializing and sending new location of driver - to client
-            NodePoint *newLocation = this->drivers[i].getLocationInGrid();
+            NodePoint *newLocation = this->drivers[index].getLocationInGrid();
             string serial_driverNewLocation;
             boost::iostreams::back_insert_device<std::string> inserter(serial_driverNewLocation);
             boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
             boost::archive::binary_oarchive oa(s);
             oa << newLocation;
             s.flush();
-            tcp->sendData(serial_driverNewLocation, this->clientsSd[i]);
-            this->setReceiveDataFlag(true,i);
+            tcp->sendData(serial_driverNewLocation, this->clientsSd[index]);
+            this->setReceiveDataFlag(true,index);
 
         } else {
             //if driver isn't on ride - check if it's time to assign him a trip
-                this->assignTripToDriver(i, tcp);
+                this->assignTripToDriver(index, tcp);
         }
     }
 }
@@ -170,4 +168,8 @@ void TaxiCenter::sendCloseToClients(Socket *tcp) {
 }
 void TaxiCenter::setNewClientSd(int newClientSd) {
     this->clientsSd.push_back(newClientSd);
+}
+void TaxiCenter::resizeDriversVec(int numOfDrivers) {
+    this->drivers.resize(this->drivers.size() + numOfDrivers);
+    this->availableToReceiveData.resize(this->availableToReceiveData.size() + numOfDrivers);
 }

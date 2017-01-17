@@ -50,7 +50,7 @@ public:
      * for each driver- set the map from the taxi center
      * @param newDriver is the new driver to add to the taxi center
      */
-    void addNewDriver(Driver newDriver);
+    void addNewDriver(Driver newDriver, int index);
     /**
      * @param newCab is the new cab to add to the taxi center
      */
@@ -103,7 +103,7 @@ public:
     /**
      * @param udp the socket to send the trip/new location to client through
      */
-    void moveAllDriversOneStep(Socket* udp);
+    void moveAllDriversOneStep(Socket* udp, int index);
     /**
      * the func change the flag to true if the taxi center has to process a new recieving data
      * @param flag the new condition of the taxi center
@@ -115,6 +115,7 @@ public:
     bool getReceiveDataFlag(int driverIndex);
     void sendCloseToClients(Socket *tcp);
     void setNewClientSd(int newClientSd);
+    void resizeDriversVec(int numOfDrivers);
     };
 struct TripData
 {

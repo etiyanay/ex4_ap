@@ -3,7 +3,6 @@
 * the class inherit from socket. 							*
 * methods of tcp socket type								*
 ************************************************************/
-#include <zconf.h>
 #include "Tcp.h"
 #include <unistd.h>
 

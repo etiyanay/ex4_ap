@@ -31,7 +31,7 @@ void menu(TaxiCenter* station, Socket* udp);
  * the func calls the method "addNewDriver" from the TaxiCenter Classs
  * @param station the taxi center
  */
-void insertDriver(TaxiCenter* station, Socket* udp, int newClientSd);
+void insertDriver(TaxiCenter* station, Socket* udp, int newClientSd, int index);
 /**
  * the func calls the method "addNewTrip" from the TaxiCenter Classs
  * @param station the taxi center
@@ -64,6 +64,7 @@ struct ClientData {
     TaxiCenter* station;
     Socket *tcp;
     int clientSd;
+    int index;
 };
 
 #endif //AP_EX1_INPUTPROCESSING_H

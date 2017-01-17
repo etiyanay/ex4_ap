@@ -14,7 +14,7 @@ using namespace boost::archive;
 vector <pthread_t> clientsThreads;
 pthread_mutex_t addDriverMutex;
 int numOfClientsThreads = 0;
-
+int extension;
 
 string bufferToString(char* buffer, int bufflen)
 {
@@ -56,7 +56,7 @@ void createObstacles(Grid* map) {
         delete obstacle;
     }
 }
-void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
+void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd, int index) {
     if (numOfClientsThreads == 0) {
         pthread_mutex_init(&addDriverMutex,0);
         numOfClientsThreads++;
@@ -72,7 +72,7 @@ void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     ia >> newDriver;
     //addind the driver to the taxi center
     pthread_mutex_lock(&addDriverMutex);
-    station->addNewDriver(*newDriver);
+    station->addNewDriver(*newDriver, index);
     pthread_mutex_unlock(&addDriverMutex);
     //sending matching cab to client
     CabFactory* matchingCab;
@@ -128,13 +128,14 @@ void driverLocationRequest(TaxiCenter* station) {
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
 void menu(TaxiCenter* station, Socket* tcp) {
-    int extension, numOfDrivers;
+    int numOfDrivers;
     cin >> extension;
     switch (extension) {
         case 1:
             cout << "before getting num of clients" << endl;
             //getting num of drivers that we are going to get from clients
             cin >> numOfDrivers;
+            station->resizeDriversVec(numOfDrivers);
             for (int i = 0; i < numOfDrivers; ++i) {
                 cout << "ready for accepting" << endl;
                 int newClientSd = tcp->tcpAccept();
@@ -143,6 +144,7 @@ void menu(TaxiCenter* station, Socket* tcp) {
                 newClient->clientSd = newClientSd;
                 newClient->station = station;
                 newClient->tcp = tcp;
+                newClient->index = i;
                 clientsThreads.resize(clientsThreads.size() + 1);
                 int size = clientsThreads.size();
                 pthread_create(&(clientsThreads[size-1]), NULL, manageClient,(void*)newClient);
@@ -161,7 +163,7 @@ void menu(TaxiCenter* station, Socket* tcp) {
             break;
         case 9:
             station->advanceTime();
-            station->moveAllDriversOneStep(tcp);
+            //station->moveAllDriversOneStep(tcp);
             break;
         case 7:
             pthread_mutex_destroy(&addDriverMutex);
@@ -179,8 +181,25 @@ void menu(TaxiCenter* station, Socket* tcp) {
 
 void *manageClient(void* element) {
     ClientData *data = (ClientData*)element;
-    insertDriver(data->station, data->tcp, data->clientSd);
+    insertDriver(data->station, data->tcp, data->clientSd, data->index);
     for (int i = 0; i < clientsThreads.size(); ++i) {
         pthread_join(clientsThreads[i], NULL);
+    }
+    while(1) {
+
+        switch (extension) {
+            case 9:
+
+                data->station->moveAllDriversOneStep(data->tcp, data->index);
+
+                //אמורים לזמן את מוב וואן סטפ בכל ט'רד כך שהוא יעדכן את הקליינט
+                //זאת אומרת שדבר ראשון צריך לדאוג שמוב וואן סטפ יעבוד פר דריבר אחד כל שכך ט'רד יעדכן את הקליינט שלו
+                //עכשיו ננוכל לקבל בywrd את האינדקס של קליינט
+                break;
+            case 7:
+                break;
+            default:
+                break;
+        }
     }
 }
