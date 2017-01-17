@@ -12,9 +12,13 @@ using namespace std;
 using namespace boost::archive;
 
 vector <pthread_t> clientsThreads;
-pthread_mutex_t addDriverMutex;
+pthread_mutex_t addDriverMutex, finishMutex;
 int numOfClientsThreads = 0;
 int extension;
+int count9extension = 0;
+int threadsFinish = 0;
+bool mutexInit = false, flagifjoin=false;
+int numOfDrivers =0;
 
 string bufferToString(char* buffer, int bufflen)
 {
@@ -128,78 +132,82 @@ void driverLocationRequest(TaxiCenter* station) {
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
 void menu(TaxiCenter* station, Socket* tcp) {
-    int numOfDrivers;
-    cin >> extension;
-    switch (extension) {
-        case 1:
-            cout << "before getting num of clients" << endl;
-            //getting num of drivers that we are going to get from clients
-            cin >> numOfDrivers;
-            station->resizeDriversVec(numOfDrivers);
-            for (int i = 0; i < numOfDrivers; ++i) {
-                cout << "ready for accepting" << endl;
-                int newClientSd = tcp->tcpAccept();
-                station->setNewClientSd(newClientSd);
-                ClientData *newClient = new ClientData();
-                newClient->clientSd = newClientSd;
-                newClient->station = station;
-                newClient->tcp = tcp;
-                newClient->index = i;
-                clientsThreads.resize(clientsThreads.size() + 1);
-                int size = clientsThreads.size();
-                pthread_create(&(clientsThreads[size-1]), NULL, manageClient,(void*)newClient);
+    //may use mutex
+    if (threadsFinish == numOfDrivers*count9extension) {
+        cin >> extension;
+        if (extension == 9)
+            count9extension++;
+        switch (extension) {
+            case 1:
+                if (mutexInit == false) {
+                    pthread_mutex_init(&finishMutex,0);
+                    mutexInit = true;
+                }
+                //getting num of drivers that we are going to get from clients
+                cin >> numOfDrivers;
+                station->resizeDriversVec(numOfDrivers);
+                for (int i = 0; i < numOfDrivers; ++i) {
+                    int newClientSd = tcp->tcpAccept();
+                    station->setNewClientSd(newClientSd);
+                    ClientData *newClient = new ClientData();
+                    newClient->clientSd = newClientSd;
+                    newClient->station = station;
+                    newClient->tcp = tcp;
+                    newClient->index = i;
+                    clientsThreads.resize(clientsThreads.size() + 1);
+                    int size = clientsThreads.size();
+                    pthread_create(&(clientsThreads[size - 1]), NULL, manageClient, (void *) newClient);
 
-                //insertDriver(station, tcp, newClientSd);
-            }
-            break;
-        case 2:
-            insertTrip(station);
-            break;
-        case 3:
-            insertCab(station);
-            break;
-        case 4:
-            driverLocationRequest(station);
-            break;
-        case 9:
-            station->advanceTime();
-            //station->moveAllDriversOneStep(tcp);
-            break;
-        case 7:
-            pthread_mutex_destroy(&addDriverMutex);
-
-            //telling the clients to shutdown themselves
-            station->sendCloseToClients(tcp);
-            //tcp->closeData();
-            delete tcp;
-            delete station;
-            exit(0);
-        default:
-            break;
+                    //insertDriver(station, tcp, newClientSd);
+                }
+                break;
+            case 2:
+                insertTrip(station);
+                break;
+            case 3:
+                insertCab(station);
+                break;
+            case 4:
+                driverLocationRequest(station);
+                break;
+            case 9:
+                station->advanceTime();
+                //station->moveAllDriversOneStep(tcp);
+                break;
+            case 7:
+                //telling the clients to shutdown themselves
+                station->sendCloseToClients(tcp);
+                //tcp->closeData();
+                delete tcp;
+                delete station;
+                pthread_mutex_destroy(&addDriverMutex);
+                pthread_mutex_destroy(&finishMutex);
+                exit(0);
+            default:
+                break;
+        }
     }
 }
 
 void *manageClient(void* element) {
     ClientData *data = (ClientData*)element;
     insertDriver(data->station, data->tcp, data->clientSd, data->index);
-    for (int i = 0; i < clientsThreads.size(); ++i) {
-        pthread_join(clientsThreads[i], NULL);
-    }
-    while(1) {
-
-        switch (extension) {
-            case 9:
-
-                data->station->moveAllDriversOneStep(data->tcp, data->index);
-
-                //אמורים לזמן את מוב וואן סטפ בכל ט'רד כך שהוא יעדכן את הקליינט
-                //זאת אומרת שדבר ראשון צריך לדאוג שמוב וואן סטפ יעבוד פר דריבר אחד כל שכך ט'רד יעדכן את הקליינט שלו
-                //עכשיו ננוכל לקבל בywrd את האינדקס של קליינט
-                break;
-            case 7:
-                break;
-            default:
-                break;
+        int stepsCounter = 0;
+        while (1) {
+            switch (extension) {
+                case 9:
+                    if (stepsCounter + 1 == count9extension) {
+                        data->station->moveAllDriversOneStep(data->tcp, data->index);
+                        stepsCounter++;
+                        //pthread_mutex_lock(&finishMutex);
+                        threadsFinish++;
+                        //pthread_mutex_unlock(&finishMutex);
+                    }
+                    break;
+                case 7:
+                    break;
+                default:
+                    break;
+            }
         }
-    }
 }

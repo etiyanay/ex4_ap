@@ -9,12 +9,12 @@ TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->currentBfs = currentBfs;
     this->time = Clock(0);
     this->firstTripFlag = false;
-    //pthread_mutex_init(&list,0);
+    pthread_mutex_init(&assignTripMutex,0);
     //this->numOfMutex = 0;
 
 }
 TaxiCenter::~TaxiCenter() {
-    //pthread_mutex_destroy(&list);
+    pthread_mutex_destroy(&assignTripMutex);
     delete this->dim;
     for (int i = 0; i < this->cabs.size(); ++i) {
         delete this->cabs[i];
@@ -99,6 +99,7 @@ bool TaxiCenter::getReceiveDataFlag(int driverIndex){
     return this->availableToReceiveData[driverIndex];
 }
 void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
+    pthread_mutex_lock(&assignTripMutex);
     int i, indexOfRelevantTrip = -1;
         for(i = 0; i < this->getNumOfTrips(); i++) {
             //check if the trip starts where the driver is
@@ -131,9 +132,9 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         tcp->sendData(serial_trip, this->clientsSd[currentDriverIndex]);
         this->setReceiveDataFlag(true, currentDriverIndex);
     }
+    pthread_mutex_unlock(&assignTripMutex);
 }
 void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
-    int numOfDrivers = this->getNumOfDrivers();
         char buffer[8096];
         if (this->getReceiveDataFlag(index)) {
             //receiveData- we get "want trip" or "want go"
@@ -157,7 +158,7 @@ void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
             //if driver isn't on ride - check if it's time to assign him a trip
                 this->assignTripToDriver(index, tcp);
         }
-    }
+
 }
 
 void TaxiCenter::sendCloseToClients(Socket *tcp) {

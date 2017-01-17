@@ -22,7 +22,7 @@ private:
     bool firstTripFlag;
     vector <bool> availableToReceiveData;
     vector <int> clientsSd;
-    pthread_mutex_t list;
+    pthread_mutex_t assignTripMutex;
     int numOfMutex;
 public:
     /**
