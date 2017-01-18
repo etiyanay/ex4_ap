@@ -17,7 +17,7 @@ int numOfClientsThreads = 0;
 int extension;
 int count9extension = 0;
 int threadsFinish = 0;
-bool mutexInit = false, flagifjoin=false;
+bool mutexInit = false;
 int numOfDrivers =0;
 
 string bufferToString(char* buffer, int bufflen)

@@ -8,10 +8,7 @@ TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
     this->time = Clock(0);
-    this->firstTripFlag = false;
     pthread_mutex_init(&assignTripMutex,0);
-    //this->numOfMutex = 0;
-
 }
 TaxiCenter::~TaxiCenter() {
     pthread_mutex_destroy(&assignTripMutex);
@@ -73,12 +70,18 @@ void TaxiCenter::addNewTrip(Trip newTrip){
     //data->mutex = this->calculatePath;
     //resize
     tripsThreads.resize(tripsThreads.size() + 1);
+    this->threadFlagIfJoin.push_back(false);
     //create new thread that runs the calculatePath func
     pthread_create(&(tripsThreads[tripsThreads.size()-1]), NULL, Bfs::calculatePath,(void*)data);
     //pthread_mutex_unlock(&list);
-
+    //cout << "num of threads: " << tripsThreads.size() <<endl;
     for (int i = 0; i < tripsThreads.size(); ++i) {
-        pthread_join(tripsThreads[i], NULL);
+        if (threadFlagIfJoin[i] == false) {
+            pthread_join(tripsThreads[i], NULL);
+            threadFlagIfJoin[i] = true;
+            //cout << "last print"<<endl;
+
+        }
     }
 
     //initializing the grid with no visited nodes- as in the beginning
@@ -124,6 +127,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         oa << newTrip;
         s.flush();
         //attach the trip to the driver
+        cout << "driver: "<<currentDriverIndex << " get trip: "<<trips[indexOfRelevantTrip].getId()<<endl;
         this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
         //delete the trip that has been set to the driver
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);

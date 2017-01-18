@@ -19,12 +19,11 @@ private:
     Bfs* currentBfs;
     Grid* dim;
     Clock time;
-    bool firstTripFlag;
     vector <bool> availableToReceiveData;
     vector <int> clientsSd;
     pthread_mutex_t assignTripMutex;
+    vector <bool> threadFlagIfJoin;
 
-    int numOfMutex;
 public:
     /**
      * default constructor
@@ -123,7 +122,6 @@ struct TripData
 {
     Trip *trip;
     Bfs *bfs;
-    //pthread_mutex_t mutex;
 };
 
 #endif //AP_EX1_TAXICENTER_H

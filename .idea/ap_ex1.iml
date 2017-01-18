@@ -2,13 +2,13 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Clock.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/client.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/NodePoint.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tcp.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Driver.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Bfs.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Point.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/LuxuryCab.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Grid.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/StandardCab.cpp" isTestSource="false" />
@@ -16,16 +16,15 @@
       <sourceFolder url="file://$MODULE_DIR$/Clock.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TaxiCenter.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CabFactory.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Passenger.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Driver.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CabFactory.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Passenger.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/StandardCab.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Point.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Socket.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/InputProcessing.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Point2D.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tcp.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Point.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/StandardCab.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Passenger.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Trip.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/NodePoint.cpp" isTestSource="false" />
@@ -33,6 +32,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Driver.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Trip.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Bfs.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/LuxuryCab.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TwoDim.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Point2D.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TwoDim.cpp" isTestSource="false" />

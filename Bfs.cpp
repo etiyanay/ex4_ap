@@ -64,11 +64,9 @@ vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
 void* Bfs::calculatePath(void *element) {
 
     pthread_mutex_lock(&myMutex);
-    cout<<"before thread"<<endl;
 
     //pthread_mutex_lock(&((TripData*)element)->mutex);
     TripData* data = (TripData*)element;
-    cout << "the trip is:  " << data->trip->getId() << endl;
     //Trip newTrip = *((Trip*)trip);
     Point *start = data->trip->getStartPoint();
     Point *end = data->trip->getEndPoint();
@@ -76,7 +74,6 @@ void* Bfs::calculatePath(void *element) {
 
     data->trip->setPath(data->bfs->runBfs(start,end));
     data->bfs->currentGrid->initializeGrid();
-    cout<<"after thread"<<endl;
 
    pthread_mutex_unlock(&myMutex);
 
