@@ -20,12 +20,12 @@ TaxiCenter::~TaxiCenter() {
 Driver TaxiCenter::findClosestDriver(Point* sourcePoint) {
     //default id
 }
-void TaxiCenter::addNewDriver(Driver newDriver, int index) {
+void TaxiCenter::addNewDriver(Driver newDriver) {
     CabFactory* matchingCab = this->findCabById(newDriver.getCabId());
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
-    this->drivers[index] = newDriver;
-    this->availableToReceiveData[index] = true;
+    this->drivers.push_back(newDriver);
+    this->availableToReceiveData.push_back(true);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
     this->cabs.push_back(newCab);
@@ -60,8 +60,6 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
-    //pthread_mutex_lock(&list);
-
     this->trips.push_back(newTrip);
     TripData *data = new TripData();
     int size = this->trips.size();
@@ -80,11 +78,6 @@ void TaxiCenter::addNewTrip(Trip newTrip){
             threadFlagIfJoin[i] = true;
         }
     }
-
-    //initializing the grid with no visited nodes- as in the beginning
-
-
-
 }
 int TaxiCenter::timeIs() {
     return this->time.timeIs();
@@ -106,6 +99,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
             if ((this->drivers[currentDriverIndex].getLocationInGrid()->getPoint()->equals
                     (trips[i].getPath()[0]->getPoint())) &&
                     ((this->trips[i].getClockTimeTrip() == this->timeIs()))) {
+
                 indexOfRelevantTrip = i;
                 break;
             }
@@ -124,6 +118,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         oa << newTripSize;
         s.flush();
         //attach the trip to the driver
+        cout << "driver: "<< drivers[currentDriverIndex].getId() << " got trip: "<< trips[indexOfRelevantTrip].getId()<<endl;
        this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
         //delete the trip that has been set to the driver
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
@@ -176,4 +171,7 @@ void TaxiCenter::resizeDriversVec(int numOfDrivers) {
 }
 void TaxiCenter::pushObstacleToMap(NodePoint* obstacleNodePoint){
     this->dim->pushObstacleToVec(obstacleNodePoint);
+}
+int TaxiCenter::getNewClientSd(int indexOfDriver) {
+    return this->clientsSd[indexOfDriver];
 }

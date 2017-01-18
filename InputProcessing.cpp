@@ -12,7 +12,7 @@ using namespace std;
 using namespace boost::archive;
 
 vector <pthread_t> clientsThreads;
-pthread_mutex_t addDriverMutex, finishMutex, closeThreadMutex;
+pthread_mutex_t finishMutex, closeThreadMutex;
 int numOfClientsThreads = 0;
 int extension;
 int count9extension = 0;
@@ -62,11 +62,7 @@ void createObstacles(Grid* map, TaxiCenter* station) {
         delete obstacle;
     }
 }
-void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd, int index) {
-    if (numOfClientsThreads == 0) {
-        pthread_mutex_init(&addDriverMutex,0);
-        numOfClientsThreads++;
-    }
+void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     //getting driver from client and diseralizing it
     Driver *newDriver;
     char buffer2[8096];
@@ -76,10 +72,8 @@ void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd, int index) 
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
     ia >> newDriver;
-    //addind the driver to the taxi center
-    pthread_mutex_lock(&addDriverMutex);
-    station->addNewDriver(*newDriver, index);
-    pthread_mutex_unlock(&addDriverMutex);
+    //adding the driver to the taxi center
+    station->addNewDriver(*newDriver);
     //sending matching cab to client
     CabFactory* matchingCab;
     matchingCab = station->findCabById(newDriver->getCabId());
@@ -149,20 +143,20 @@ void menu(TaxiCenter* station, Socket* tcp) {
 
                 //getting num of drivers that we are going to get from clients
                 cin >> numOfDrivers;
-                station->resizeDriversVec(numOfDrivers);
+                //station->resizeDriversVec(numOfDrivers);
                 for (int i = 0; i < numOfDrivers; ++i) {
                     int newClientSd = tcp->tcpAccept();
                     station->setNewClientSd(newClientSd);
+                    insertDriver(station, tcp, newClientSd);
+                }
+                clientsThreads.resize(numOfDrivers);
+                for (int j = 0; j < numOfDrivers; ++j) {
                     ClientData *newClient = new ClientData();
-                    newClient->clientSd = newClientSd;
+                    newClient->clientSd = station->getNewClientSd(j);
                     newClient->station = station;
                     newClient->tcp = tcp;
-                    newClient->index = i;
-                    clientsThreads.resize(clientsThreads.size() + 1);
-                    int size = clientsThreads.size();
-                    pthread_create(&(clientsThreads[size - 1]), NULL, manageClient, (void *) newClient);
-
-                    //insertDriver(station, tcp, newClientSd);
+                    newClient->index = j;
+                    pthread_create(&(clientsThreads[j]), NULL, manageClient, (void *) newClient);
                 }
                 break;
             case 2:
@@ -179,14 +173,10 @@ void menu(TaxiCenter* station, Socket* tcp) {
                 //station->moveAllDriversOneStep(tcp);
                 break;
             case 7:
-                //telling the clients to shutdown themselves
-                //station->sendCloseToClients(tcp);
-                //tcp->closeData();
                 while (1) {
                     if (ifAllSocketsClosed == numOfDrivers) {
                         delete tcp;
                         delete station;
-                        pthread_mutex_destroy(&addDriverMutex);
                         pthread_mutex_destroy(&closeThreadMutex);
                         pthread_mutex_destroy(&finishMutex);
                         exit(0);
@@ -200,7 +190,6 @@ void menu(TaxiCenter* station, Socket* tcp) {
 
 void *manageClient(void* element) {
     ClientData *data = (ClientData*)element;
-    insertDriver(data->station, data->tcp, data->clientSd, data->index);
         int stepsCounter = 0;
         while (1) {
             switch (extension) {
@@ -208,9 +197,9 @@ void *manageClient(void* element) {
                     if (stepsCounter + 1 == count9extension) {
                         data->station->moveAllDriversOneStep(data->tcp, data->index);
                         stepsCounter++;
-                        //pthread_mutex_lock(&finishMutex);
+                        pthread_mutex_lock(&finishMutex);
                         threadsFinish++;
-                        //pthread_mutex_unlock(&finishMutex);
+                        pthread_mutex_unlock(&finishMutex);
                     }
                     break;
                 case 7:

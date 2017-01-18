@@ -50,7 +50,7 @@ public:
      * for each driver- set the map from the taxi center
      * @param newDriver is the new driver to add to the taxi center
      */
-    void addNewDriver(Driver newDriver, int index);
+    void addNewDriver(Driver newDriver);
     /**
      * @param newCab is the new cab to add to the taxi center
      */
@@ -117,6 +117,7 @@ public:
     void setNewClientSd(int newClientSd);
     void resizeDriversVec(int numOfDrivers);
     void pushObstacleToMap(NodePoint* obstacleNodePoint);
+    int getNewClientSd(int indexOfDriver);
     };
 struct TripData
 {
