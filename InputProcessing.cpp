@@ -12,13 +12,14 @@ using namespace std;
 using namespace boost::archive;
 
 vector <pthread_t> clientsThreads;
-pthread_mutex_t addDriverMutex, finishMutex;
+pthread_mutex_t addDriverMutex, finishMutex, closeThreadMutex;
 int numOfClientsThreads = 0;
 int extension;
 int count9extension = 0;
 int threadsFinish = 0;
 bool mutexInit = false;
 int numOfDrivers =0;
+int ifAllSocketsClosed = 0;
 
 string bufferToString(char* buffer, int bufflen)
 {
@@ -142,8 +143,10 @@ void menu(TaxiCenter* station, Socket* tcp) {
             case 1:
                 if (mutexInit == false) {
                     pthread_mutex_init(&finishMutex,0);
+                    pthread_mutex_init(&closeThreadMutex,0);
                     mutexInit = true;
                 }
+
                 //getting num of drivers that we are going to get from clients
                 cin >> numOfDrivers;
                 station->resizeDriversVec(numOfDrivers);
@@ -177,13 +180,19 @@ void menu(TaxiCenter* station, Socket* tcp) {
                 break;
             case 7:
                 //telling the clients to shutdown themselves
-                station->sendCloseToClients(tcp);
+                //station->sendCloseToClients(tcp);
                 //tcp->closeData();
-                delete tcp;
-                delete station;
-                pthread_mutex_destroy(&addDriverMutex);
-                pthread_mutex_destroy(&finishMutex);
-                exit(0);
+                while (1) {
+                    if (ifAllSocketsClosed == numOfDrivers) {
+                        delete tcp;
+                        delete station;
+                        pthread_mutex_destroy(&addDriverMutex);
+                        pthread_mutex_destroy(&closeThreadMutex);
+                        pthread_mutex_destroy(&finishMutex);
+                        cout << "gameover!!!!!" << endl;
+                        exit(0);
+                    }
+                }
             default:
                 break;
         }
@@ -206,6 +215,12 @@ void *manageClient(void* element) {
                     }
                     break;
                 case 7:
+                    cout<<"close in thread"<<endl;
+                    data->tcp->sendData("close", data->clientSd);
+                    pthread_mutex_lock(&closeThreadMutex);
+                    ifAllSocketsClosed++;
+                    pthread_mutex_unlock(&closeThreadMutex);
+                    pthread_exit(NULL);
                     break;
                 default:
                     break;
