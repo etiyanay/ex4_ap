@@ -189,7 +189,6 @@ void menu(TaxiCenter* station, Socket* tcp) {
                         pthread_mutex_destroy(&addDriverMutex);
                         pthread_mutex_destroy(&closeThreadMutex);
                         pthread_mutex_destroy(&finishMutex);
-                        cout << "gameover!!!!!" << endl;
                         exit(0);
                     }
                 }
@@ -215,7 +214,6 @@ void *manageClient(void* element) {
                     }
                     break;
                 case 7:
-                    cout<<"close in thread"<<endl;
                     data->tcp->sendData("close", data->clientSd);
                     pthread_mutex_lock(&closeThreadMutex);
                     ifAllSocketsClosed++;

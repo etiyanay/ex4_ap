@@ -74,13 +74,10 @@ void TaxiCenter::addNewTrip(Trip newTrip){
     //create new thread that runs the calculatePath func
     pthread_create(&(tripsThreads[tripsThreads.size()-1]), NULL, Bfs::calculatePath,(void*)data);
     //pthread_mutex_unlock(&list);
-    //cout << "num of threads: " << tripsThreads.size() <<endl;
     for (int i = 0; i < tripsThreads.size(); ++i) {
         if (threadFlagIfJoin[i] == false) {
             pthread_join(tripsThreads[i], NULL);
             threadFlagIfJoin[i] = true;
-            //cout << "last print"<<endl;
-
         }
     }
 
@@ -118,17 +115,16 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         //serializing
         this->trips[indexOfRelevantTrip].setStartPoint();
         this->trips[indexOfRelevantTrip].setEndPoint();
-        Trip *newTrip;
-        newTrip = &this->trips[indexOfRelevantTrip];
+        Trip newTrip = this->trips[indexOfRelevantTrip];
+        int newTripSize = newTrip.getPath().size();
         string serial_trip;
         boost::iostreams::back_insert_device<std::string> inserter(serial_trip);
         boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
         boost::archive::binary_oarchive oa(s);
-        oa << newTrip;
+        oa << newTripSize;
         s.flush();
         //attach the trip to the driver
-        cout << "driver: "<<currentDriverIndex << " get trip: "<<trips[indexOfRelevantTrip].getId()<<endl;
-        this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
+       this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
         //delete the trip that has been set to the driver
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
         this->drivers[currentDriverIndex].setIsAvailable(false);
@@ -139,7 +135,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     pthread_mutex_unlock(&assignTripMutex);
 }
 void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
-        char buffer[8096];
+        char buffer[2048];
         if (this->getReceiveDataFlag(index)) {
             //receiveData- we get "want trip" or "want go"
             tcp->reciveData(buffer, sizeof(buffer), this->clientsSd[index]);

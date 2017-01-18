@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     Tcp tcp(0, atoi(argv[2]));
     tcp.initialize();
 //
-    char buffer[8096];
+    char buffer[2048];
     int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
     char statusOfDriver, dummy;
     Driver *newDriver;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     //sending the serialized driver
     tcp.sendData(serial_str, 0);
     //getting the cab and diserializing it
-    char buffer2[8096];
+    char buffer2[2048];
     CabFactory* matchingCab;
     tcp.reciveData(buffer2, sizeof(buffer2), 0);
     string serial_str2 = bufferToString(buffer2, sizeof(buffer2));
@@ -44,20 +44,16 @@ int main(int argc, char *argv[]) {
     //setting the cab to the driver
     newDriver->setCab(matchingCab);
     //endless loop for getting trips and GO advances- till we get "close" from server
-    Trip *newTrip = NULL;
+    int newTrip = 0;
     bool ifDriverHasTrip = false;
     while (1) {
         tcp.sendData("wait_for_a_trip", 0);
         //getting the trip and diserializing it
-        char buffer3[8096];
+        char buffer3[2048];
         tcp.reciveData(buffer3, sizeof(buffer3), 0);
         string serial_trip = bufferToString(buffer3, sizeof(buffer3));
         //if we get "close" - we release allocating memory and finish
         if (strcmp(serial_trip.data(), "close") ==0) {
-            if (ifDriverHasTrip) {
-                newDriver->deleteTripFromClient();
-            }
-            delete newTrip;
             delete matchingCab;
             if (newDriver->getLocationInGrid() != NULL)
                 newDriver->deleteLocationInClient();
@@ -65,29 +61,22 @@ int main(int argc, char *argv[]) {
             tcp.closeData();
             return 0;
         }
-        delete newTrip;
         boost::iostreams::basic_array_source<char> device2(serial_trip.c_str(), serial_trip.size());
         boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(device2);
         boost::archive::binary_iarchive ia2(s3);
         ia2 >> newTrip;
         //setting the trip to the driver
-        if (ifDriverHasTrip)
-            newDriver->deleteTripFromClient();
-        newDriver->setNewTrip(*newTrip);
-        ifDriverHasTrip = true;
         NodePoint *newLocation;
-        int sizeOfTrip = newDriver->getTrip().getPath().size();
+        int sizeOfTrip = newTrip;
         //advance the driver to its next location in trip's path
         for (int i = 1; i < sizeOfTrip; ++i) {
             tcp.sendData("wait_for_GO", 0);
             //getting driver's new location and diseralizing it
-            char newLocationBuffer[8096];
+            char newLocationBuffer[2048];
             tcp.reciveData(newLocationBuffer, sizeof(newLocationBuffer), 0);
             string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
             if (strcmp(serial_location.data(), "close") ==0) {
                 //the driver already has a trip inside
-                newDriver->deleteTripFromClient();
-                delete newTrip;
                 delete matchingCab;
                 if (newDriver->getLocationInGrid() != NULL)
                     newDriver->deleteLocationInClient();
