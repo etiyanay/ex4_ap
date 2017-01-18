@@ -113,11 +113,11 @@ public:
      * @return true if the taxi center is busy to get applies, else return false
      */
     bool getReceiveDataFlag(int driverIndex);
-    void sendCloseToClients(Socket *tcp);
     void setNewClientSd(int newClientSd);
-    void resizeDriversVec(int numOfDrivers);
     void pushObstacleToMap(NodePoint* obstacleNodePoint);
     int getNewClientSd(int indexOfDriver);
+    int tripsPriority(int currentDriverIndex, int lastDriverIndex);
+
     };
 struct TripData
 {

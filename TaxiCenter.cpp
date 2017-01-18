@@ -93,15 +93,18 @@ bool TaxiCenter::getReceiveDataFlag(int driverIndex){
 }
 void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     pthread_mutex_lock(&assignTripMutex);
+    int flagPriority = -1;
     int i, indexOfRelevantTrip = -1;
         for(i = 0; i < this->getNumOfTrips(); i++) {
             //check if the trip starts where the driver is
             if ((this->drivers[currentDriverIndex].getLocationInGrid()->getPoint()->equals
                     (trips[i].getPath()[0]->getPoint())) &&
                     ((this->trips[i].getClockTimeTrip() == this->timeIs()))) {
-
-                indexOfRelevantTrip = i;
-                break;
+                flagPriority = this->tripsPriority(currentDriverIndex, flagPriority);
+                if (flagPriority == -2) {
+                    indexOfRelevantTrip = i;
+                    break;
+                }
             }
     }
     //if we did find a correct trip - assign it
@@ -118,7 +121,6 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
         oa << newTripSize;
         s.flush();
         //attach the trip to the driver
-        cout << "driver: "<< drivers[currentDriverIndex].getId() << " got trip: "<< trips[indexOfRelevantTrip].getId()<<endl;
        this->drivers[currentDriverIndex].setNewTrip(trips[indexOfRelevantTrip]);
         //delete the trip that has been set to the driver
         this->trips.erase(this->trips.begin() + indexOfRelevantTrip);
@@ -156,22 +158,21 @@ void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
 
 }
 
-void TaxiCenter::sendCloseToClients(Socket *tcp) {
-    int sizeOfClients = this->clientsSd.size();
-    for (int i = 0; i < sizeOfClients; ++i) {
-        tcp->sendData("close", this->clientsSd[i]);
-    }
-}
 void TaxiCenter::setNewClientSd(int newClientSd) {
     this->clientsSd.push_back(newClientSd);
-}
-void TaxiCenter::resizeDriversVec(int numOfDrivers) {
-    this->drivers.resize(this->drivers.size() + numOfDrivers);
-    this->availableToReceiveData.resize(this->availableToReceiveData.size() + numOfDrivers);
 }
 void TaxiCenter::pushObstacleToMap(NodePoint* obstacleNodePoint){
     this->dim->pushObstacleToVec(obstacleNodePoint);
 }
 int TaxiCenter::getNewClientSd(int indexOfDriver) {
     return this->clientsSd[indexOfDriver];
+}
+int TaxiCenter::tripsPriority(int currentDriverIndex, int lastDriverIndex) {
+    Point* currentLocation = this->drivers[currentDriverIndex].getLocationInGrid()->getPoint();
+    for (int i = lastDriverIndex + 1; i < currentDriverIndex; ++i) {
+        if ((this->drivers[i].getLocationInGrid()->getPoint()->equals(currentLocation)) &&
+                (this->drivers[i].getIsAvailable()))
+            return i;
+    }
+    return -2;
 }
