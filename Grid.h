@@ -49,6 +49,8 @@ public:
      * or nodes that have fathers
      */
     virtual void initializeGrid()=0;
+    virtual void pushObstacleToVec(NodePoint* obstacle)= 0;
+    virtual void initializeObstaclesInGrid() = 0;
 };
 
 #endif //AP_EX1_GRID_H

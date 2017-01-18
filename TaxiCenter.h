@@ -23,6 +23,7 @@ private:
     vector <bool> availableToReceiveData;
     vector <int> clientsSd;
     pthread_mutex_t assignTripMutex;
+
     int numOfMutex;
 public:
     /**
@@ -116,6 +117,7 @@ public:
     void sendCloseToClients(Socket *tcp);
     void setNewClientSd(int newClientSd);
     void resizeDriversVec(int numOfDrivers);
+    void pushObstacleToMap(NodePoint* obstacleNodePoint);
     };
 struct TripData
 {

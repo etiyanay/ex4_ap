@@ -47,7 +47,7 @@ int countDimension(string inputOfPoint) {
         if (inputOfPoint[i] == '_') count++;
     return (count + 1);
 }
-void createObstacles(Grid* map) {
+void createObstacles(Grid* map, TaxiCenter* station) {
     int numOfObstacles, xObstacle, yObstacle;
     char dummy;
     cin >> numOfObstacles;
@@ -56,7 +56,8 @@ void createObstacles(Grid* map) {
         cin >> xObstacle >> dummy >> yObstacle;;
         obstacle = new Point2D(xObstacle, yObstacle);
         NodePoint * obstacleNodePoint = map->whereIsTheNode(obstacle);
-        obstacleNodePoint->setVisited();
+        station->pushObstacleToMap(obstacleNodePoint);
+        //obstacleNodePoint->setVisited();
         delete obstacle;
     }
 }

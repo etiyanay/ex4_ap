@@ -16,6 +16,7 @@ class TwoDim : public Grid {
 private:
     int sizeX, sizeY;
     NodePoint** ptrAllNodes;
+    vector <NodePoint*> obstacles;
 public:
     /**
      * ctor
@@ -61,5 +62,7 @@ public:
     * or nodes that have fathers
     */
     void initializeGrid();
+    void pushObstacleToVec(NodePoint* obstacle);
+    void initializeObstaclesInGrid();
 };
 #endif //AP_EX1_TWODIM_H

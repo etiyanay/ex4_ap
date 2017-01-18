@@ -174,3 +174,6 @@ void TaxiCenter::resizeDriversVec(int numOfDrivers) {
     this->drivers.resize(this->drivers.size() + numOfDrivers);
     this->availableToReceiveData.resize(this->availableToReceiveData.size() + numOfDrivers);
 }
+void TaxiCenter::pushObstacleToMap(NodePoint* obstacleNodePoint){
+    this->dim->pushObstacleToVec(obstacleNodePoint);
+}

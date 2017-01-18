@@ -79,4 +79,15 @@ void TwoDim::initializeGrid() {
             this->ptrAllNodes[i][j].setNotVisited();
         }
     }
+    this->initializeObstaclesInGrid();
+
+}
+void TwoDim::pushObstacleToVec(NodePoint* obstacle){
+    this->obstacles.push_back(obstacle);
+}
+void TwoDim::initializeObstaclesInGrid(){
+    int numOfObstacles = this->obstacles.size();
+    for (int i = 0; i < numOfObstacles; ++i) {
+        this->obstacles[i]->setVisited();
+    }
 }

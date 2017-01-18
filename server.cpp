@@ -17,8 +17,10 @@ int main(int argc, char* argv[]) {
     Grid *map = new TwoDim(xGrid, yGrid);
     Bfs currentBfs(map);
     TaxiCenter* station = new TaxiCenter(map, &currentBfs);
-    //initializing obstacles
-    createObstacles(map);
+    //push obstacles to vec
+    createObstacles(map, station);
+    //initialize obstacles
+    map->initializeObstaclesInGrid();
     //running menu
     while (1) {
         menu(station, tcp);
