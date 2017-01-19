@@ -31,7 +31,7 @@ NodePoint* Bfs::bfsAlgorithm(Point* startPoint, Point* destination) {
         }
         vector<Point*>neighbors = this->currentGrid->neighborsPoints(tempNode->getPoint());
         int i;
-        //for each neighbor, check if wasn't visited and set as visited and insert to the queue
+        // for each neighbor, check if wasn't visited and set as visited and insert to the queue
         for (i = 0; i < neighbors.size(); ++i) {
             NodePoint* child = this->currentGrid->whereIsTheNode(neighbors[i]);
             //deleting the point from memory- after finding its node's location
