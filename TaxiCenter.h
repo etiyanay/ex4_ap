@@ -103,7 +103,7 @@ public:
     /**
      * @param udp the socket to send the trip/new location to client through
      */
-    void moveAllDriversOneStep(Socket* udp, int index);
+    void moveDriverOneStep(Socket* udp, int index);
     /**
      * the func change the flag to true if the taxi center has to process a new recieving data
      * @param flag the new condition of the taxi center

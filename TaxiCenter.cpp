@@ -61,13 +61,11 @@ Point* TaxiCenter::findDriverLocationById(int id) {
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
     //pthread_mutex_lock(&list);
-
     this->trips.push_back(newTrip);
     TripData *data = new TripData();
     int size = this->trips.size();
     data->trip = &(this->trips[size-1]);
     data->bfs = this->currentBfs;
-    //data->mutex = this->calculatePath;
     //resize
     tripsThreads.resize(tripsThreads.size() + 1);
     this->threadFlagIfJoin.push_back(false);
@@ -137,7 +135,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     }
     pthread_mutex_unlock(&assignTripMutex);
 }
-void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
+void TaxiCenter::moveDriverOneStep(Socket* tcp, int index) {
     char buffer[2048];
     if (this->getReceiveDataFlag(index)) {
         //receiveData- we get "want trip" or "want go"
