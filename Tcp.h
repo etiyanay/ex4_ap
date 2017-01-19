@@ -50,7 +50,19 @@ public:
     * the data															   *
     ***********************************************************************/
     int reciveData(char* buffer, int size, int descriptor);
+    /***********************************************************************
+	* function name: closeData	`										   *
+	* The Input: none										               *
+	* The output: int number representing if succeed                       *
+	* The Function operation: close the connection with the client         *
+	***********************************************************************/
     int closeData();
+    /***********************************************************************
+    * function name: tcpAccept	`										   *
+    * The Input: none										               *
+    * The output: int number representing if succeed                       *
+    * The Function operation: create the connection with the client         *
+    ***********************************************************************/
     int tcpAccept();
 };
 

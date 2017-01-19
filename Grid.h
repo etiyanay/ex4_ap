@@ -54,7 +54,7 @@ public:
      */
     virtual void pushObstacleToVec(NodePoint* obstacle)= 0;
     /*
-     * consider the nodes of obtcales as setVisited
+     * consider the nodes of obstacles as setVisited
      */
     virtual void initializeObstaclesInGrid() = 0;
 };

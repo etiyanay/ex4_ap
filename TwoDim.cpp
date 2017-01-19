@@ -83,10 +83,12 @@ void TwoDim::initializeGrid() {
 
 }
 void TwoDim::pushObstacleToVec(NodePoint* obstacle){
+    //push the current obstacle to vec
     this->obstacles.push_back(obstacle);
 }
 void TwoDim::initializeObstaclesInGrid(){
     int numOfObstacles = this->obstacles.size();
+    //initialize every vector to be `visited`
     for (int i = 0; i < numOfObstacles; ++i) {
         this->obstacles[i]->setVisited();
     }
