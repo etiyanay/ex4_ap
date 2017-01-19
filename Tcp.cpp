@@ -121,7 +121,7 @@ int Tcp::reciveData(char* buffer, int size, int descriptor) {
         return ERROR_RECIVE;
     } else {
         //prinrting the massege
-//		cout<<buffer<<endl;
+        //cout<<buffer<<endl;
     }
     //return correct if there were no problem
     return read_bytes;

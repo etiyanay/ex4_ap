@@ -79,7 +79,8 @@ void insertTrip(TaxiCenter* station) {
     Trip newTrip;
     //getting the trip from the console
     cin >> idOfTrip >> dummy >> xStartTrip >> dummy >> yStartTrip >> dummy >> xEndTrip >> dummy
-        >> yEndTrip >> dummy >> numOfPassengerTrip >> dummy >> tariffTrip >> dummy >> clockTimeTrip;
+        >> yEndTrip >> dummy >> numOfPassengerTrip >> dummy >> tariffTrip
+        >> dummy >> clockTimeTrip;
     p2DStart = Point2D(xStartTrip, yStartTrip);
     p2DEnd = Point2D(xEndTrip, yEndTrip);
     source = &p2DStart;

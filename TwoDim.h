@@ -44,13 +44,6 @@ public:
      * @return "true" if it's in the range, "false" if not
      */
     bool ifInRange(Point* current);
-    /**
-     * the funcs initialize the grid with nodes inside
-     */
-    //void initializeGrid();
-    /**
-     * @return the ptr to thr dim
-     */
     NodePoint** getPtrGrid();
     /**
      * @param currentPoint the point to find its node in the grid
@@ -62,7 +55,13 @@ public:
     * or nodes that have fathers
     */
     void initializeGrid();
+    /*
+    * push the obstacle to obstacle`s vector
+    */
     void pushObstacleToVec(NodePoint* obstacle);
+    /*
+    * consider the nodes of obstacles as setVisited
+    */
     void initializeObstaclesInGrid();
 };
 #endif //AP_EX1_TWODIM_H

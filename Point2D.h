@@ -21,7 +21,7 @@
 using namespace std;
 using namespace boost::archive;
 /**
- * this class derives from the abstract class - "Point"
+ * this class derives from the abstract class- "Point"
  * it represents the 2D point type (x,y)
  */
 class Point2D : public Point {

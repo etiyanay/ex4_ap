@@ -35,7 +35,8 @@ public:
     NodePoint* bfsAlgorithm(Point* startPoint, Point* destination);
     /**
     * @param startPoint is the pointer to the start point
-    * @param destination is the pointer to the destination point* the func calls the bfsAlgorithm() func, and from the last node it extracts the previous nodes
+    * @param destination is the pointer to the destination point* the func calls the
+    * bfsAlgorithm() func, and from the last node it extracts the previous nodes
     * @return vector with all the nodes on the path to the destination
     */
     vector<NodePoint*> runBfs(Point* startPoint, Point* destination);
