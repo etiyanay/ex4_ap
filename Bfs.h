@@ -14,7 +14,6 @@ using namespace std;
 class Bfs {
 private:
     Grid* currentGrid;
-    //pthread_mutex_t myMutex;
 public:
     Bfs(){};
     /**
@@ -40,6 +39,11 @@ public:
     * @return vector with all the nodes on the path to the destination
     */
     vector<NodePoint*> runBfs(Point* startPoint, Point* destination);
+    /**
+     * static function to create and set the path to the trip we got
+     * @param trip will get the path we calculate
+     * @return void
+     */
     static void *calculatePath(void *trip);
 };
 #endif //AP_EX1_BFS_H

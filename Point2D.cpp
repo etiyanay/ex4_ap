@@ -51,6 +51,9 @@ int Point2D::getX() {
 int Point2D::getY() {
     return y;
 }
+/*
+ * print the point
+ */
 void Point2D::printPoint(ostream &os) const{
     os<<"(" << this->x << "," << this->y << ")";
 

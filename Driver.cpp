@@ -88,6 +88,3 @@ void Driver::moveOneStep(int time){
 void Driver::deleteLocationInClient() {
     delete location;
 }
-void Driver::deleteTripFromClient(){
-    this->currentTrip.deleteTripInClient();
-}

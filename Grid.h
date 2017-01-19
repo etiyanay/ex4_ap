@@ -49,7 +49,13 @@ public:
      * or nodes that have fathers
      */
     virtual void initializeGrid()=0;
+    /*
+     * push the obstacle to obstacle`s vector
+     */
     virtual void pushObstacleToVec(NodePoint* obstacle)= 0;
+    /*
+     * consider the nodes of obtcales as setVisited
+     */
     virtual void initializeObstaclesInGrid() = 0;
 };
 
