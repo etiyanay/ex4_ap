@@ -14,7 +14,7 @@ class Grid {
 public:
     /**
      * constructor
-     * @return a new grid -> will create in the derived classes
+     * @return a new grid -> will create in the derived classses
      */
     Grid(){};
     /**
