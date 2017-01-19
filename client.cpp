@@ -59,7 +59,8 @@ int main(int argc, char *argv[]) {
             tcp.closeData();
             return 0;
         }
-        boost::iostreams::basic_array_source<char> device2(serial_trip.c_str(), serial_trip.size());
+        boost::iostreams::basic_array_source<char> device2(serial_trip.c_str(),
+                                                           serial_trip.size());
         boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(device2);
         boost::archive::binary_iarchive ia2(s3);
         ia2 >> newTrip;
@@ -81,7 +82,8 @@ int main(int argc, char *argv[]) {
                 tcp.closeData();
                 return 0;
             }
-            boost::iostreams::basic_array_source<char> device3(serial_location.c_str(), serial_location.size());
+            boost::iostreams::basic_array_source<char> device3(serial_location.c_str(),
+                                                               serial_location.size());
             boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s4(device3);
             boost::archive::binary_iarchive ia3(s4);
             ia3 >> newLocation;
