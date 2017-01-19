@@ -83,7 +83,7 @@ public:
 	/***********************************************************************
 	* function name: tcpAccept	`										   *
 	* The Input: none										               *
-	* The output: int number representing if succeed              *
+	* The output: int number representing if succeed                       *
 	* The Function operation: create to connection with the client         *
 	***********************************************************************/
 	virtual int tcpAccept() = 0;
