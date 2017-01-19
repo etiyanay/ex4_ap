@@ -26,28 +26,6 @@ string bufferToString(char* buffer, int bufflen)
     string ret(buffer, bufflen);
     return ret;
 }
-string* stringPoints(string input) {
-    string* strPtr = new string[3];
-    int index = 0, found;
-    //separate the string by ','
-    while (input != "\0") {
-        found = input.find(',');
-        if (found == -1) {
-            strPtr[index] = input;
-            break;
-        }
-        strPtr[index] = input.substr(0, found);
-        input.erase(0, found + 1);
-        index++;
-    }
-    return  strPtr;
-}
-int countDimension(string inputOfPoint) {
-    int count = 0, i;
-    for (i = 0; i < inputOfPoint.size(); i++)
-        if (inputOfPoint[i] == '_') count++;
-    return (count + 1);
-}
 void createObstacles(Grid* map, TaxiCenter* station) {
     int numOfObstacles, xObstacle, yObstacle;
     char dummy;
@@ -58,7 +36,6 @@ void createObstacles(Grid* map, TaxiCenter* station) {
         obstacle = new Point2D(xObstacle, yObstacle);
         NodePoint * obstacleNodePoint = map->whereIsTheNode(obstacle);
         station->pushObstacleToMap(obstacleNodePoint);
-        //obstacleNodePoint->setVisited();
         delete obstacle;
     }
 }
@@ -69,7 +46,7 @@ void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd, int index) 
     }
     //getting driver from client and diseralizing it
     Driver *newDriver;
-    char buffer2[8096];
+    char buffer2[2048];
     tcp->reciveData(buffer2, sizeof(buffer2), newClientSd);
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
@@ -134,25 +111,27 @@ void driverLocationRequest(TaxiCenter* station) {
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
 void menu(TaxiCenter* station, Socket* tcp) {
-    //may use mutex
     if (threadsFinish == numOfDrivers*count9extension) {
         cin >> extension;
         if (extension == 9)
             count9extension++;
         switch (extension) {
             case 1:
+                //initializing the mutex once!
                 if (mutexInit == false) {
                     pthread_mutex_init(&finishMutex,0);
                     pthread_mutex_init(&closeThreadMutex,0);
                     mutexInit = true;
                 }
-
                 //getting num of drivers that we are going to get from clients
                 cin >> numOfDrivers;
+                //increasing the vector to contain the drivers we are going to get
                 station->resizeDriversVec(numOfDrivers);
                 for (int i = 0; i < numOfDrivers; ++i) {
+                    //"hand shake" with a new client and saving its socket descriptor
                     int newClientSd = tcp->tcpAccept();
                     station->setNewClientSd(newClientSd);
+                    //creating a clientData Struct to send to the thread
                     ClientData *newClient = new ClientData();
                     newClient->clientSd = newClientSd;
                     newClient->station = station;
@@ -160,6 +139,7 @@ void menu(TaxiCenter* station, Socket* tcp) {
                     newClient->index = i;
                     clientsThreads.resize(clientsThreads.size() + 1);
                     int size = clientsThreads.size();
+                    //create new thread to manage a client
                     int status = pthread_create(&(clientsThreads[size - 1]), NULL, manageClient,
                                                 (void *)newClient);
                     if (status)
@@ -180,6 +160,7 @@ void menu(TaxiCenter* station, Socket* tcp) {
                 break;
             case 7:
                 while (1) {
+                    //check if all the threads finish closing
                     if (ifAllSocketsClosed == numOfDrivers) {
                         delete tcp;
                         delete station;
@@ -197,11 +178,13 @@ void menu(TaxiCenter* station, Socket* tcp) {
 
 void *manageClient(void* element) {
     ClientData *data = (ClientData*)element;
+    //each of the thread, first inserts the driver to the station
     insertDriver(data->station, data->tcp, data->clientSd, data->index);
     int stepsCounter = 0;
     while (1) {
         switch (extension) {
             case 9:
+                //check if
                 if (stepsCounter + 1 == count9extension) {
                     data->station->moveAllDriversOneStep(data->tcp, data->index);
                     stepsCounter++;

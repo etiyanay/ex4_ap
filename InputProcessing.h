@@ -11,17 +11,7 @@
 #include "Socket.h"
 
 //this header declares about the helping funcs in the main- that process the inputs and the menu
-/**
- * @param input is the input from the user, "sizeX_sizeY,startX_startY,endX,endY"
- * @return a pointer to a string arr which contains the 3 three points as strings
- */
-string* stringPoints(string input);
-/**
- * @param inputOfPoint is the dim size as a string
- * @return the ammount of '_' which determine the dim of the grid +1
- * the dim will be the ammount of '_' + 1.
- */
-int countDimension(string inputOfPoint);
+
 /**
  * the func operates the menu and is called from the main
  * @param station the taxi center
@@ -59,7 +49,16 @@ void createObstacles(Grid* map, TaxiCenter* station);
  * @return a new string
  */
 string bufferToString(char* buffer, int bufflen);
+/**
+ * that func is sent to a new thread. the thread is in charge of the connection with a client
+ * and inserts a new driver and send/recieve locations.
+ * @param element get ClientData Struct
+ * @return void
+ */
 void *manageClient(void* element);
+/**
+ * the struct to sent to a thread
+ */
 struct ClientData {
     TaxiCenter* station;
     Socket *tcp;
