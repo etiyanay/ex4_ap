@@ -32,10 +32,6 @@ public:
     */
     virtual bool ifInRange(Point* current) = 0;
     /**
-    * this func initialize the grid with nodes with cordinates[x][y]
-    */
-    //virtual void initializeGrid() = 0;
-    /**
     * @return the pointer to the grid (as a NodePoint*)
     */
     virtual NodePoint** getPtrGrid() = 0;

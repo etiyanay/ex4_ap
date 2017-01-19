@@ -41,11 +41,6 @@ public:
      */
     ~TaxiCenter();
     /**
-     * @param sourcePoint the source point of a passenger
-     * @return the closest driver to the passenger
-     */
-    Driver findClosestDriver(Point* sourcePoint);
-    /**
      * the func adds a driver to the drivers in the taxi center.
      * for each driver- set the map from the taxi center
      * @param newDriver is the new driver to add to the taxi center
@@ -55,12 +50,6 @@ public:
      * @param newCab is the new cab to add to the taxi center
      */
     void addNewCab(CabFactory* newCab);
-    /**
-     * getting from prosseced input- start and end points for creating the trip
-     * @param sourcePoint is the start point
-     * @param destination is the destination of the passenger
-     */
-    void getCall(Point* sourcePoint, Point* destination);
     /**
      * @return the num of drivers in the taxi center
      */
@@ -113,11 +102,25 @@ public:
      * @return true if the taxi center is busy to get applies, else return false
      */
     bool getReceiveDataFlag(int driverIndex);
-    void sendCloseToClients(Socket *tcp);
+    /**
+     * the func gets new client socket descriptor and save it in the sd vec
+     * @param newClientSd that we got in accept func of "hand shake"
+     */
     void setNewClientSd(int newClientSd);
+    /**
+     * the func gets a num of clients, and resize the vec of drivers and sd of drivers accordingly
+     * @param numOfDrivers num of clients to insert
+     */
     void resizeDriversVec(int numOfDrivers);
+    /**
+     * the func get a nodePoint obstacle- and set that node as "visited"
+     * @param obstacleNodePoint
+     */
     void pushObstacleToMap(NodePoint* obstacleNodePoint);
 };
+/**
+ * the struct that contains the info we are sending to the threads that calculate the trips paths
+ */
 struct TripData
 {
     Trip *trip;

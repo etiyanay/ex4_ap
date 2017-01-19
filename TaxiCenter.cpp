@@ -3,7 +3,6 @@
 using namespace std;
 vector <pthread_t> tripsThreads;
 
-
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
@@ -17,24 +16,17 @@ TaxiCenter::~TaxiCenter() {
         delete this->cabs[i];
     }
 }
-Driver TaxiCenter::findClosestDriver(Point* sourcePoint) {
-    //default id
-}
 void TaxiCenter::addNewDriver(Driver newDriver, int index) {
     CabFactory* matchingCab = this->findCabById(newDriver.getCabId());
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
+    //assigning the new driver in its cell index in vec
     this->drivers[index] = newDriver;
+    //setting available flag of driver i as available.
     this->availableToReceiveData[index] = true;
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
     this->cabs.push_back(newCab);
-}
-void TaxiCenter::getCall(Point* sourcePoint, Point* destination){
-    /*
-     * Trip newTrip = Trip(id, sourcePoint, destination, tariff);
-    this->findClosestDriver(sourcePoint).setNewTrip(newTrip);
-     */
 }
 int TaxiCenter::getNumOfDrivers() {
     return this->drivers.size();
@@ -60,13 +52,12 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
 }
 void TaxiCenter::addNewTrip(Trip newTrip){
-    //pthread_mutex_lock(&list);
     this->trips.push_back(newTrip);
     TripData *data = new TripData();
     int size = this->trips.size();
     data->trip = &(this->trips[size-1]);
     data->bfs = this->currentBfs;
-    //resize
+    //resize threads vec
     tripsThreads.resize(tripsThreads.size() + 1);
     this->threadFlagIfJoin.push_back(false);
     //create new thread that runs the calculatePath func
@@ -74,18 +65,13 @@ void TaxiCenter::addNewTrip(Trip newTrip){
                                 (void*)data);
     if (status)
         exit(0);
-    //pthread_mutex_unlock(&list);
+    //waiting for threads to finish calculating and setting the new trip
     for (int i = 0; i < tripsThreads.size(); ++i) {
         if (threadFlagIfJoin[i] == false) {
             pthread_join(tripsThreads[i], NULL);
             threadFlagIfJoin[i] = true;
         }
     }
-
-    //initializing the grid with no visited nodes- as in the beginning
-
-
-
 }
 int TaxiCenter::timeIs() {
     return this->time.timeIs();
@@ -154,18 +140,9 @@ void TaxiCenter::moveDriverOneStep(Socket* tcp, int index) {
         s.flush();
         tcp->sendData(serial_driverNewLocation, this->clientsSd[index]);
         this->setReceiveDataFlag(true,index);
-
     } else {
         //if driver isn't on ride - check if it's time to assign him a trip
         this->assignTripToDriver(index, tcp);
-    }
-
-}
-
-void TaxiCenter::sendCloseToClients(Socket *tcp) {
-    int sizeOfClients = this->clientsSd.size();
-    for (int i = 0; i < sizeOfClients; ++i) {
-        tcp->sendData("close", this->clientsSd[i]);
     }
 }
 void TaxiCenter::setNewClientSd(int newClientSd) {

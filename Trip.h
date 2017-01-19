@@ -65,7 +65,8 @@ public:
      * @param tariff the cost of the trip
      * @return a new trip
      */
-    Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff, int clockTimeTrip);
+    Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff,
+         int clockTimeTrip);
     /**
      * ctor
      * @param id the trip's id
@@ -120,6 +121,9 @@ public:
      * @return the time that the trip should start
      */
     int getClockTimeTrip();
+    /**
+     * the func delete the trip info in the client
+     */
     void deleteTripInClient();
 };
 #endif //AP_EX1_TRIP_H

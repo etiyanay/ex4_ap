@@ -2,7 +2,8 @@
 
 using namespace std;
 
-Trip::Trip(int id, Point* source, Point* destination, int numOfPassengers, double tariff, int clockTimeTrip) {
+Trip::Trip(int id, Point* source, Point* destination, int numOfPassengers,
+           double tariff, int clockTimeTrip) {
     this->id = id;
     this->startPoint = source;
     this->endPoint = destination;
