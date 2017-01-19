@@ -116,7 +116,7 @@ void createObstacles(Grid* map, TaxiCenter* station) {
 void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     //getting driver from client and diseralizing it
     Driver *newDriver;
-    char buffer2[8096];
+    char buffer2[2048];
     tcp->reciveData(buffer2, sizeof(buffer2), newClientSd);
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
@@ -285,6 +285,7 @@ void *manageClient(void* element) {
                 }
                 break;
             case 7:
+                //closing client and update counter
                 data->tcp->sendData("close", data->clientSd);
                 pthread_mutex_lock(&closeThreadMutex);
                 ifAllSocketsClosed++;

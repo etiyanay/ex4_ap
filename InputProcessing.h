@@ -35,7 +35,7 @@ void menu(TaxiCenter* station, Socket* udp);
  * the func calls the method "addNewDriver" from the TaxiCenter Classs
  * @param station the taxi center
  */
-void insertDriver(TaxiCenter* station, Socket* udp, int newClientSd, int index);
+void insertDriver(TaxiCenter* station, Socket* udp, int newClientSd);
 /**
  * the func calls the method "addNewTrip" from the TaxiCenter Classs
  * @param station the taxi center

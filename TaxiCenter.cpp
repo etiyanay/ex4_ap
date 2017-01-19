@@ -3,7 +3,6 @@
 using namespace std;
 vector <pthread_t> tripsThreads;
 
-
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
@@ -22,6 +21,9 @@ void TaxiCenter::addNewDriver(Driver newDriver) {
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
     this->drivers.push_back(newDriver);
+    this->availableToReceiveData.push_back(true);
+    this->drivers.push_back(newDriver);
+    //setting available flag of driver i as available.
     this->availableToReceiveData.push_back(true);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
@@ -143,14 +145,11 @@ void TaxiCenter::moveDriverOneStep(Socket* tcp, int index) {
         s.flush();
         tcp->sendData(serial_driverNewLocation, this->clientsSd[index]);
         this->setReceiveDataFlag(true,index);
-
     } else {
         //if driver isn't on ride - check if it's time to assign him a trip
         this->assignTripToDriver(index, tcp);
     }
-
 }
-
 void TaxiCenter::setNewClientSd(int newClientSd) {
     this->clientsSd.push_back(newClientSd);
 }
