@@ -184,9 +184,9 @@ void *manageClient(void* element) {
     while (1) {
         switch (extension) {
             case 9:
-                //check if
+                //check if the thread already advanced the client
                 if (stepsCounter + 1 == count9extension) {
-                    data->station->moveAllDriversOneStep(data->tcp, data->index);
+                    data->station->moveDriverOneStep(data->tcp, data->index);
                     stepsCounter++;
                     pthread_mutex_lock(&finishMutex);
                     threadsFinish++;

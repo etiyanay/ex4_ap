@@ -135,7 +135,7 @@ void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     }
     pthread_mutex_unlock(&assignTripMutex);
 }
-void TaxiCenter::moveAllDriversOneStep(Socket* tcp, int index) {
+void TaxiCenter::moveDriverOneStep(Socket* tcp, int index) {
     char buffer[2048];
     if (this->getReceiveDataFlag(index)) {
         //receiveData- we get "want trip" or "want go"
