@@ -80,7 +80,19 @@ public:
     * the data															   *
     ***********************************************************************/
 	virtual int reciveData(char* buffer, int size, int descriptor) = 0;
+	/***********************************************************************
+	* function name: tcpAccept	`										   *
+	* The Input: none										               *
+	* The output: int number representing if succeed                       *
+	* The Function operation: create to connection with the client         *
+	***********************************************************************/
 	virtual int tcpAccept() = 0;
+	/***********************************************************************
+	* function name: closeData	`										   *
+	* The Input: none										               *
+	* The output: int number representing if succeed                       *
+	* The Function operation: colse the connection with the client         *
+	***********************************************************************/
 	virtual int closeData()=0;
 };
 

@@ -11,7 +11,6 @@ using namespace boost::archive;
 int main(int argc, char *argv[]) {
     Tcp tcp(0, atoi(argv[2]));
     tcp.initialize();
-//
     char buffer[2048];
     int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
     char statusOfDriver, dummy;
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]) {
     bool ifDriverHasTrip = false;
     while (1) {
         tcp.sendData("wait_for_a_trip", 0);
-        //getting the trip and diserializing it
+        //getting the num of steps in trip and diserializing it
         char buffer3[2048];
         tcp.reciveData(buffer3, sizeof(buffer3), 0);
         string serial_trip = bufferToString(buffer3, sizeof(buffer3));
@@ -64,7 +63,6 @@ int main(int argc, char *argv[]) {
         boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s3(device2);
         boost::archive::binary_iarchive ia2(s3);
         ia2 >> newTrip;
-        //setting the trip to the driver
         NodePoint *newLocation;
         int sizeOfTrip = newTrip;
         //advance the driver to its next location in trip's path
@@ -74,8 +72,8 @@ int main(int argc, char *argv[]) {
             char newLocationBuffer[2048];
             tcp.reciveData(newLocationBuffer, sizeof(newLocationBuffer), 0);
             string serial_location = bufferToString(newLocationBuffer, sizeof(newLocationBuffer));
+            //if we got "Close" from server - we release allocating memory and finish
             if (strcmp(serial_location.data(), "close") ==0) {
-                //the driver already has a trip inside
                 delete matchingCab;
                 if (newDriver->getLocationInGrid() != NULL)
                     newDriver->deleteLocationInClient();

@@ -141,8 +141,10 @@ public:
      * @param time is the time in taxi center's clock
      */
     void moveOneStep(int time);
+    /*
+     * delete the location in client
+     */
     void deleteLocationInClient();
-    void deleteTripFromClient();
 };
 
 #endif //AP_EX1_DRIVER_H
