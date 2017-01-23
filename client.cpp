@@ -9,15 +9,35 @@ using namespace std;
 using namespace boost::archive;
 
 int main(int argc, char *argv[]) {
+    string driverString;
+    cin >> driverString;
+    int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
+    char statusOfDriver, dummy;
+    //counting how many members that separated by ','
+    int numOfMembers = countMembers(driverString, ',');
+    //if there is less/more parameters than supposed to be
+    if (numOfMembers != 5) {
+        //cout << "-1" << endl;
+        return 0;
+    }
+    vector<string> separatedMembers;
+    separatedMembers.resize(numOfMembers);
+    separateString(driverString, separatedMembers, ',');
+    int isValid = driverInputProcessing(separatedMembers);
+    if (isValid == -1) {
+        //cout << "-1" << endl;
+        return 0;
+    }
     Tcp tcp(0, atoi(argv[2]));
     tcp.initialize();
     char buffer[2048];
-    int idOfDriver, ageOfDriver, experienceOfDriver, idVehicelOfDriver;
-    char statusOfDriver, dummy;
     Driver *newDriver;
-    //getting input from console
-    cin >> idOfDriver >> dummy >> ageOfDriver >> dummy >> statusOfDriver >> dummy
-        >> experienceOfDriver >> dummy >> idVehicelOfDriver;
+    //the input is valid
+    idOfDriver = atoi(separatedMembers[0].c_str());
+    ageOfDriver = atoi(separatedMembers[1].c_str());
+    statusOfDriver = separatedMembers[2][0];
+    experienceOfDriver = atoi(separatedMembers[3].c_str());
+    idVehicelOfDriver = atoi(separatedMembers[4].c_str());
     //creating driver
     newDriver = new Driver(idOfDriver, ageOfDriver, Marital(statusOfDriver)
             ,experienceOfDriver,idVehicelOfDriver);

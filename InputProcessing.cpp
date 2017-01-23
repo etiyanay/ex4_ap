@@ -79,6 +79,37 @@ int cabInputProcessing(vector<string> &separatedMembers) {
         return  -1;
     return 0;
 }
+int driverInputProcessing(vector<string> &separatedMembers) {
+    //check id of driver
+    if(!ifStringIsNum(separatedMembers[0].c_str()))
+        return -1;
+    int id = atoi(separatedMembers[0].c_str());
+    if (!ifGreaterThan(id, 0))
+        return -1;
+    //check age
+    if(!ifStringIsNum(separatedMembers[1].c_str()))
+        return -1;
+    int age = atoi(separatedMembers[1].c_str());
+    if (!ifGreaterThan(age, 0))
+        return -1;
+    //check status
+    if((separatedMembers[2].compare("S") != 0) && (separatedMembers[2].compare("M") != 0) &&
+       (separatedMembers[2].compare("D") != 0) && (separatedMembers[2].compare("W") != 0))
+        return  -1;
+    //check experience years
+    if(!ifStringIsNum(separatedMembers[3].c_str()))
+        return -1;
+    int experience = atoi(separatedMembers[3].c_str());
+    if (!ifGreaterThan(experience, 0))
+        return -1;
+    //check id of cab
+    if(!ifStringIsNum(separatedMembers[4].c_str()))
+        return -1;
+    int cabId = atoi(separatedMembers[4].c_str());
+    if (!ifGreaterThan(cabId, 0))
+        return -1;
+    return 0;
+}
 
 void createObstacles(Grid* map) {
     int numOfObstacles, xObstacle, yObstacle;
@@ -161,12 +192,9 @@ void insertTrip(TaxiCenter* station) {
 void insertCab(TaxiCenter* station) {
     string cabString;
     cin >> cabString;
-
     int idOfCab, typeOfCab;
     char manufacturerOfCab, colorOfCab, dummy;
     CabFactory* newCab;
-    //getting the cab from console
-    //create vector -> resize ->
     //counting how many members that separated by ','
     int numOfMembers = countMembers(cabString, ',');
     //if there is less/more parameters than supposed to be
