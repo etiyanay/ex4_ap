@@ -11,6 +11,20 @@
 #include "Socket.h"
 
 //this header declares about the helping funcs in the main- that process the inputs and the menu
+/**
+ * @param input is the input from the user, "sizeX_sizeY,startX_startY,endX,endY"
+ * @return a pointer to a string arr which contains the 3 three points as strings
+ */
+void separateString(string input, vector<string> &separatedStrings, char separator);
+/**
+ * @param inputOfPoint is the dim size as a string
+ * @return the ammount of '_' which determine the dim of the grid +1
+ * the dim will be the ammount of '_' + 1.
+ */
+int countMembers(string inputOfPoint, char separator);
+int cabInputProcessing(vector<string> &separatedMembers);
+bool ifGreaterThan(int num, int lowerBound);
+bool ifStringIsNum(string str);
 
 /**
  * the func operates the menu and is called from the main

@@ -45,7 +45,7 @@ public:
      * for each driver- set the map from the taxi center
      * @param newDriver is the new driver to add to the taxi center
      */
-    void addNewDriver(Driver newDriver, int index);
+    void addNewDriver(Driver newDriver);
     /**
      * @param newCab is the new cab to add to the taxi center
      */
@@ -108,15 +108,23 @@ public:
      */
     void setNewClientSd(int newClientSd);
     /**
-     * the func gets a num of clients, and resize the vec of drivers and sd of drivers accordingly
-     * @param numOfDrivers num of clients to insert
-     */
-    void resizeDriversVec(int numOfDrivers);
-    /**
      * the func get a nodePoint obstacle- and set that node as "visited"
      * @param obstacleNodePoint
      */
     void pushObstacleToMap(NodePoint* obstacleNodePoint);
+    /**
+     *
+     * @param indexOfDriver index of driver
+     * @return the socket descriptor of the driver
+     */
+    int getNewClientSd(int indexOfDriver);
+    /**
+     *
+     * @param currentDriverIndex the current driver to check if has a trip to assign
+     * @param lastDriverIndex the last index that we gave him the trip, instead of taking it
+     * @return trip's index we are giving up on
+     */
+    int tripsPriority(int currentDriverIndex, int lastDriverIndex);
 };
 /**
  * the struct that contains the info we are sending to the threads that calculate the trips paths

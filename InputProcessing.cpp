@@ -12,7 +12,7 @@ using namespace std;
 using namespace boost::archive;
 
 vector <pthread_t> clientsThreads;
-pthread_mutex_t addDriverMutex, finishMutex, closeThreadMutex;
+pthread_mutex_t finishMutex, closeThreadMutex;
 int numOfClientsThreads = 0;
 int extension;
 int count9extension = 0;
@@ -21,11 +21,84 @@ bool mutexInit = false;
 int numOfDrivers =0;
 int ifAllSocketsClosed = 0;
 
+void separateString(string input, vector<string> &separatedStrings, char separator) {
+    int index = 0, found;
+    //separate the string by ','
+    while (input != "\0") {
+        found = input.find(separator);
+        if (found == -1) {
+            separatedStrings[index] = input;
+            break;
+        }
+        separatedStrings[index] = input.substr(0, found);
+        input.erase(0, found + 1);
+        index++;
+    }
+}
+int countMembers(string inputOfPoint, char separator) {
+    int count = 0, i;
+    for (i = 0; i < inputOfPoint.size(); i++)
+        if (inputOfPoint[i] == separator) count++;
+    return (count + 1);
+}
+
+bool ifGreaterThan(int num, int lowerBound) {
+    if (num >= lowerBound)
+        return true;
+    else
+        return false;
+}
+
+bool ifStringIsNum(string str){
+    int strLength = str.length();
+    for (int i = 0; i < strLength; ++i) {
+        if (!isdigit(str[i]))
+            return false;
+    }
+    return true;
+}
+
+int cabInputProcessing(vector<string> &separatedMembers) {
+
+    //check id
+    if(!ifStringIsNum(separatedMembers[0].c_str()))
+        return -1;
+    int id = atoi(separatedMembers[0].c_str());
+    if (!ifGreaterThan(id, 0))
+        return -1;
+    //check type of cab if 1 or 2
+    if((separatedMembers[1].compare("1") != 0) && (separatedMembers[1].compare("2") != 0))
+        return  -1;
+    //check manufacturer
+    if((separatedMembers[2].compare("H") != 0) && (separatedMembers[2].compare("T") != 0) &&
+            (separatedMembers[2].compare("S") != 0) && (separatedMembers[2].compare("F") != 0))
+        return  -1;
+    if((separatedMembers[3].compare("R") != 0) && (separatedMembers[3].compare("B") != 0) &&
+       (separatedMembers[3].compare("G") != 0) && (separatedMembers[3].compare("P") != 0) &&
+            (separatedMembers[3].compare("W") != 0))
+        return  -1;
+    return 0;
+}
+
+void createObstacles(Grid* map) {
+    int numOfObstacles, xObstacle, yObstacle;
+    char dummy;
+    cin >> numOfObstacles;
+    Point *obstacle;
+    for (int i = 0; i < numOfObstacles; i++) {
+        cin >> xObstacle >> dummy >> yObstacle;;
+        obstacle = new Point2D(xObstacle, yObstacle);
+        NodePoint *obstacleNodePoint = map->whereIsTheNode(obstacle);
+        obstacleNodePoint->setVisited();
+        delete obstacle;
+    }
+}
 string bufferToString(char* buffer, int bufflen)
 {
     string ret(buffer, bufflen);
     return ret;
 }
+
 void createObstacles(Grid* map, TaxiCenter* station) {
     int numOfObstacles, xObstacle, yObstacle;
     char dummy;
@@ -36,27 +109,22 @@ void createObstacles(Grid* map, TaxiCenter* station) {
         obstacle = new Point2D(xObstacle, yObstacle);
         NodePoint * obstacleNodePoint = map->whereIsTheNode(obstacle);
         station->pushObstacleToMap(obstacleNodePoint);
+        //obstacleNodePoint->setVisited();
         delete obstacle;
     }
 }
-void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd, int index) {
-    if (numOfClientsThreads == 0) {
-        pthread_mutex_init(&addDriverMutex,0);
-        numOfClientsThreads++;
-    }
+void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     //getting driver from client and diseralizing it
     Driver *newDriver;
-    char buffer2[2048];
+    char buffer2[8096];
     tcp->reciveData(buffer2, sizeof(buffer2), newClientSd);
     string serial_str = bufferToString(buffer2, sizeof(buffer2));
     boost::iostreams::basic_array_source<char> device(serial_str.c_str(), serial_str.size());
     boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
     boost::archive::binary_iarchive ia(s2);
     ia >> newDriver;
-    //addind the driver to the taxi center
-    pthread_mutex_lock(&addDriverMutex);
-    station->addNewDriver(*newDriver, index);
-    pthread_mutex_unlock(&addDriverMutex);
+    //adding the driver to the taxi center
+    station->addNewDriver(*newDriver);
     //sending matching cab to client
     CabFactory* matchingCab;
     matchingCab = station->findCabById(newDriver->getCabId());
@@ -90,11 +158,34 @@ void insertTrip(TaxiCenter* station) {
     station->addNewTrip(newTrip);
 }
 void insertCab(TaxiCenter* station) {
+    string cabString;
+    cin >> cabString;
+
     int idOfCab, typeOfCab;
     char manufacturerOfCab, colorOfCab, dummy;
     CabFactory* newCab;
     //getting the cab from console
-    cin >> idOfCab >> dummy >> typeOfCab >> dummy >> manufacturerOfCab >> dummy >> colorOfCab;
+    //create vector -> resize ->
+    //counting how many members that separated by ','
+    int numOfMembers = countMembers(cabString, ',');
+    //if there is less/more parameters than supposed to be
+    if (numOfMembers != 4) {
+        cout << "-1" << endl;
+        return;
+    }
+    vector<string> separatedMembers;
+    separatedMembers.resize(numOfMembers);
+    separateString(cabString, separatedMembers, ',');
+    int isValid = cabInputProcessing(separatedMembers);
+    if (isValid == -1) {
+        cout << "-1" << endl;
+        return;
+    }
+    //the input is valid
+    idOfCab = atoi(separatedMembers[0].c_str());
+    typeOfCab = atoi(separatedMembers[1].c_str());
+    manufacturerOfCab = separatedMembers[2][0];
+    colorOfCab = separatedMembers[3][0];
     if (typeOfCab == 1) {
         newCab = new StandardCab(idOfCab, Manufacturer(manufacturerOfCab),
                                  Color(colorOfCab));
@@ -111,6 +202,7 @@ void driverLocationRequest(TaxiCenter* station) {
     cout << station->findDriverLocationById(idOfDriver) << endl;
 }
 void menu(TaxiCenter* station, Socket* tcp) {
+    int status;
     if (threadsFinish == numOfDrivers*count9extension) {
         cin >> extension;
         if (extension == 9)
@@ -125,23 +217,24 @@ void menu(TaxiCenter* station, Socket* tcp) {
                 }
                 //getting num of drivers that we are going to get from clients
                 cin >> numOfDrivers;
-                //increasing the vector to contain the drivers we are going to get
-                station->resizeDriversVec(numOfDrivers);
                 for (int i = 0; i < numOfDrivers; ++i) {
                     //"hand shake" with a new client and saving its socket descriptor
                     int newClientSd = tcp->tcpAccept();
                     station->setNewClientSd(newClientSd);
+                    insertDriver(station, tcp, newClientSd);
+                }
+                //increasing the vector to contain the threads we are going to get
+                clientsThreads.resize(numOfDrivers);
+                for (int j = 0; j < numOfDrivers; ++j) {
                     //creating a clientData Struct to send to the thread
                     ClientData *newClient = new ClientData();
-                    newClient->clientSd = newClientSd;
+                    newClient->clientSd = station->getNewClientSd(j);
                     newClient->station = station;
                     newClient->tcp = tcp;
-                    newClient->index = i;
-                    clientsThreads.resize(clientsThreads.size() + 1);
-                    int size = clientsThreads.size();
+                    newClient->index = j;
                     //create new thread to manage a client
-                    int status = pthread_create(&(clientsThreads[size - 1]), NULL, manageClient,
-                                                (void *)newClient);
+                    status = pthread_create(&(clientsThreads[j]), NULL, manageClient,
+                                            (void *) newClient);
                     if (status)
                         exit(0);
                 }
@@ -164,7 +257,6 @@ void menu(TaxiCenter* station, Socket* tcp) {
                     if (ifAllSocketsClosed == numOfDrivers) {
                         delete tcp;
                         delete station;
-                        pthread_mutex_destroy(&addDriverMutex);
                         pthread_mutex_destroy(&closeThreadMutex);
                         pthread_mutex_destroy(&finishMutex);
                         exit(0);
@@ -178,8 +270,6 @@ void menu(TaxiCenter* station, Socket* tcp) {
 
 void *manageClient(void* element) {
     ClientData *data = (ClientData*)element;
-    //each of the thread, first inserts the driver to the station
-    insertDriver(data->station, data->tcp, data->clientSd, data->index);
     int stepsCounter = 0;
     while (1) {
         switch (extension) {
@@ -199,6 +289,7 @@ void *manageClient(void* element) {
                 ifAllSocketsClosed++;
                 pthread_mutex_unlock(&closeThreadMutex);
                 pthread_exit(NULL);
+                break;
             default:
                 break;
         }

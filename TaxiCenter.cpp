@@ -3,6 +3,7 @@
 using namespace std;
 vector <pthread_t> tripsThreads;
 
+
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
     this->currentBfs = currentBfs;
@@ -16,14 +17,12 @@ TaxiCenter::~TaxiCenter() {
         delete this->cabs[i];
     }
 }
-void TaxiCenter::addNewDriver(Driver newDriver, int index) {
+void TaxiCenter::addNewDriver(Driver newDriver) {
     CabFactory* matchingCab = this->findCabById(newDriver.getCabId());
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
-    //assigning the new driver in its cell index in vec
-    this->drivers[index] = newDriver;
-    //setting available flag of driver i as available.
-    this->availableToReceiveData[index] = true;
+    this->drivers.push_back(newDriver);
+    this->availableToReceiveData.push_back(true);
 }
 void TaxiCenter::addNewCab(CabFactory* newCab){
     this->cabs.push_back(newCab);
@@ -87,14 +86,18 @@ bool TaxiCenter::getReceiveDataFlag(int driverIndex){
 }
 void TaxiCenter::assignTripToDriver(int currentDriverIndex, Socket* tcp) {
     pthread_mutex_lock(&assignTripMutex);
+    int flagPriority = -1;
     int i, indexOfRelevantTrip = -1;
     for(i = 0; i < this->getNumOfTrips(); i++) {
         //check if the trip starts where the driver is
         if ((this->drivers[currentDriverIndex].getLocationInGrid()->getPoint()->equals
                 (trips[i].getPath()[0]->getPoint())) &&
             ((this->trips[i].getClockTimeTrip() == this->timeIs()))) {
-            indexOfRelevantTrip = i;
-            break;
+            flagPriority = this->tripsPriority(currentDriverIndex, flagPriority);
+            if (flagPriority == -2) {
+                indexOfRelevantTrip = i;
+                break;
+            }
         }
     }
     //if we did find a correct trip - assign it
@@ -140,18 +143,29 @@ void TaxiCenter::moveDriverOneStep(Socket* tcp, int index) {
         s.flush();
         tcp->sendData(serial_driverNewLocation, this->clientsSd[index]);
         this->setReceiveDataFlag(true,index);
+
     } else {
         //if driver isn't on ride - check if it's time to assign him a trip
         this->assignTripToDriver(index, tcp);
     }
+
 }
+
 void TaxiCenter::setNewClientSd(int newClientSd) {
     this->clientsSd.push_back(newClientSd);
 }
-void TaxiCenter::resizeDriversVec(int numOfDrivers) {
-    this->drivers.resize(this->drivers.size() + numOfDrivers);
-    this->availableToReceiveData.resize(this->availableToReceiveData.size() + numOfDrivers);
-}
 void TaxiCenter::pushObstacleToMap(NodePoint* obstacleNodePoint){
     this->dim->pushObstacleToVec(obstacleNodePoint);
+}
+int TaxiCenter::getNewClientSd(int indexOfDriver) {
+    return this->clientsSd[indexOfDriver];
+}
+int TaxiCenter::tripsPriority(int currentDriverIndex, int lastDriverIndex) {
+    Point* currentLocation = this->drivers[currentDriverIndex].getLocationInGrid()->getPoint();
+    for (int i = lastDriverIndex + 1; i < currentDriverIndex; ++i) {
+        if ((this->drivers[i].getLocationInGrid()->getPoint()->equals(currentLocation)) &&
+            (this->drivers[i].getIsAvailable()))
+            return i;
+    }
+    return -2;
 }
