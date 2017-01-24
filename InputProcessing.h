@@ -29,6 +29,7 @@ int driverInputProcessing(vector<string> &separatedMembers);
 Grid* createGridAndObstacles();
 int gridSizeInputProcessing();
 Point* validObstacle(string obstacleStr);
+int getNumOfClients();
 
 /**
  * the func operates the menu and is called from the main
@@ -74,6 +75,9 @@ string bufferToString(char* buffer, int bufflen);
  * @return void
  */
 void *manageClient(void* element);
+
+int tripInputProcessing(vector<string> &separatedMembers, Point* mapSize);
+
 /**
  * the struct to sent to a thread
  */

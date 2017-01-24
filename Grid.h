@@ -53,6 +53,7 @@ public:
      * consider the nodes of obstacles as setVisited
      */
     virtual void initializeObstaclesInGrid() = 0;
+    virtual Point* getGridSize() = 0;
 };
 
 #endif //AP_EX1_GRID_H

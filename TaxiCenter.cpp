@@ -21,8 +21,6 @@ void TaxiCenter::addNewDriver(Driver newDriver) {
     newDriver.setCab(matchingCab);
     newDriver.setLocation(dim->getPtrGrid()[0]);
     this->drivers.push_back(newDriver);
-    this->availableToReceiveData.push_back(true);
-    this->drivers.push_back(newDriver);
     //setting available flag of driver i as available.
     this->availableToReceiveData.push_back(true);
 }
@@ -51,19 +49,20 @@ Point* TaxiCenter::findDriverLocationById(int id) {
         if (this->drivers[i].getId() == id)
             return this->drivers[i].getLocationInGrid()->getPoint();
     }
+    return NULL;
 }
-void TaxiCenter::addNewTrip(Trip newTrip){
+void TaxiCenter::addNewTrip(Trip newTrip) {
     this->trips.push_back(newTrip);
     TripData *data = new TripData();
     int size = this->trips.size();
-    data->trip = &(this->trips[size-1]);
+    data->trip = &(this->trips[size - 1]);
     data->bfs = this->currentBfs;
     //resize threads vec
     tripsThreads.resize(tripsThreads.size() + 1);
     this->threadFlagIfJoin.push_back(false);
     //create new thread that runs the calculatePath func
-    int status = pthread_create(&(tripsThreads[tripsThreads.size()-1]), NULL, Bfs::calculatePath,
-                                (void*)data);
+    int status = pthread_create(&(tripsThreads[tripsThreads.size() - 1]), NULL, Bfs::calculatePath,
+                                (void *) data);
     if (status)
         exit(0);
     //waiting for threads to finish calculating and setting the new trip
@@ -71,6 +70,15 @@ void TaxiCenter::addNewTrip(Trip newTrip){
         if (threadFlagIfJoin[i] == false) {
             pthread_join(tripsThreads[i], NULL);
             threadFlagIfJoin[i] = true;
+        }
+    }
+    int numOfDeletedTrips = 0;
+    int tripsSize = this->trips.size();
+    for (int i = 0; i < tripsSize; ++i) {
+        if (NULL == this->trips[i-numOfDeletedTrips].getPath()[0]) {
+            cout << "path is unreachable in ADDNEWTRIP" << endl;
+            this->trips.erase(this->trips.begin() + i-numOfDeletedTrips);
+            numOfDeletedTrips++;
         }
     }
 }
@@ -167,4 +175,7 @@ int TaxiCenter::tripsPriority(int currentDriverIndex, int lastDriverIndex) {
             return i;
     }
     return -2;
+}
+Point* TaxiCenter::getMapSize() {
+    return this->dim->getGridSize();
 }

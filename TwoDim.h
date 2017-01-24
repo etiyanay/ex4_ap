@@ -63,5 +63,6 @@ public:
     * consider the nodes of obstacles as setVisited
     */
     void initializeObstaclesInGrid();
+    Point* getGridSize();
 };
 #endif //AP_EX1_TWODIM_H

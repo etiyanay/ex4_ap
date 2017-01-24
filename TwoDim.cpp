@@ -93,3 +93,7 @@ void TwoDim::initializeObstaclesInGrid(){
         this->obstacles[i]->setVisited();
     }
 }
+Point* TwoDim::getGridSize() {
+    Point* current = new Point2D(this->sizeX, this->sizeY);
+    return current;
+}
