@@ -111,6 +111,91 @@ int driverInputProcessing(vector<string> &separatedMembers) {
     return 0;
 }
 
+int gridSizeInputProcessing() {
+
+
+}
+
+Point* validObstacle(string obstacleStr) {
+    //counting how many members that separated by "space"
+    int numOfMembers = countMembers(obstacleStr, ',');
+    //if there is less/more parameters than supposed to be
+    if (numOfMembers != 2) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    vector<string> separatedMembers;
+    separatedMembers.resize(numOfMembers);
+    separateString(obstacleStr, separatedMembers, ',');
+    int xGrid = atoi(separatedMembers[0].c_str());
+    int yGrid = atoi(separatedMembers[1].c_str());
+    if (!ifGreaterThan(xGrid,0) && !ifGreaterThan(yGrid,0)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    Point *obs = new Point2D(xGrid, yGrid);
+    return obs;
+}
+
+Grid* createGridAndObstacles() {
+    string xStr, yStr;
+    cin >> xStr;
+    cin >> yStr;
+    if(!ifStringIsNum(xStr) || !ifStringIsNum(yStr)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    int xGrid = atoi(xStr.c_str());
+    int yGrid = atoi(yStr.c_str());
+    if (!ifGreaterThan(xGrid,1) || !ifGreaterThan(yGrid,1)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    //grid is valid, now get the num of obstacles input
+    string numOfObstacles;
+    cin >> numOfObstacles;
+    if(!ifStringIsNum(numOfObstacles)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    //num of obstacles is valid, check the points
+    int obstacles = atoi(numOfObstacles.c_str());
+    vector<Point2D> obstaclesVec;
+    for (int i = 0; i < obstacles; ++i) {
+        string newObstacleStr;
+        cin >> newObstacleStr;
+        //counting how many members that separated by "space"
+        int numOfMembers = countMembers(newObstacleStr, ',');
+        //if there is less/more parameters than supposed to be
+        if (numOfMembers != 2) {
+            cout << "-1" << endl;
+            return NULL;
+        }
+        vector<string> separatedMembers;
+        separatedMembers.resize(numOfMembers);
+        separateString(newObstacleStr, separatedMembers, ',');
+        int xPoint = atoi(separatedMembers[0].c_str());
+        int yPoint = atoi(separatedMembers[1].c_str());
+        if ((!ifGreaterThan(xPoint, 0) && !ifGreaterThan(yPoint, 0)) ||
+                (xPoint >= xGrid) || (yPoint >= yGrid)) {
+            cout << "-1" << endl;
+            return NULL;
+        }
+        obstaclesVec.push_back(Point2D(xPoint, yPoint));
+    }
+    //obstacles are valid, now create the map and initialize the obstacles points
+    Grid *map = new TwoDim(xGrid, yGrid);
+    Point* obstaclePoint;
+    for (int i = 0; i < obstacles; i++) {
+        obstaclePoint = new Point2D(obstaclesVec[i]);
+        NodePoint *obstacleNodePoint = map->whereIsTheNode(obstaclePoint);
+        obstacleNodePoint->setVisited();
+        map->pushObstacleToVec(obstacleNodePoint);
+        delete obstaclePoint;
+    }
+    return map;
+}
+
 void createObstacles(Grid* map) {
     int numOfObstacles, xObstacle, yObstacle;
     char dummy;
@@ -193,7 +278,7 @@ void insertCab(TaxiCenter* station) {
     string cabString;
     cin >> cabString;
     int idOfCab, typeOfCab;
-    char manufacturerOfCab, colorOfCab, dummy;
+    char manufacturerOfCab, colorOfCab;
     CabFactory* newCab;
     //counting how many members that separated by ','
     int numOfMembers = countMembers(cabString, ',');
