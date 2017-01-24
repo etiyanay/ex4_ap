@@ -58,6 +58,23 @@ bool ifStringIsNum(string str){
     return true;
 }
 
+bool ifStringIsDouble(string str){
+    int strLength = str.length();
+    bool flagDot = false;
+    if (!isdigit(str[0]))
+        return false;
+    for (int i = 1; i < strLength; ++i) {
+        if (!isdigit(str[i])) {
+            if (((str[i]) == '.') && (flagDot == false)) {
+                flagDot = true;
+            } else {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 int cabInputProcessing(vector<string> &separatedMembers) {
 
     //check id
@@ -78,6 +95,122 @@ int cabInputProcessing(vector<string> &separatedMembers) {
             (separatedMembers[3].compare("W") != 0))
         return  -1;
     return 0;
+}
+int driverInputProcessing(vector<string> &separatedMembers) {
+    //check id of driver
+    if(!ifStringIsNum(separatedMembers[0].c_str()))
+        return -1;
+    int id = atoi(separatedMembers[0].c_str());
+    if (!ifGreaterThan(id, 0))
+        return -1;
+    //check age
+    if(!ifStringIsNum(separatedMembers[1].c_str()))
+        return -1;
+    int age = atoi(separatedMembers[1].c_str());
+    if (!ifGreaterThan(age, 0))
+        return -1;
+    //check status
+    if((separatedMembers[2].compare("S") != 0) && (separatedMembers[2].compare("M") != 0) &&
+       (separatedMembers[2].compare("D") != 0) && (separatedMembers[2].compare("W") != 0))
+        return  -1;
+    //check experience years
+    if(!ifStringIsNum(separatedMembers[3].c_str()))
+        return -1;
+    int experience = atoi(separatedMembers[3].c_str());
+    if (!ifGreaterThan(experience, 0))
+        return -1;
+    //check id of cab
+    if(!ifStringIsNum(separatedMembers[4].c_str()))
+        return -1;
+    int cabId = atoi(separatedMembers[4].c_str());
+    if (!ifGreaterThan(cabId, 0))
+        return -1;
+    return 0;
+}
+
+int gridSizeInputProcessing() {
+
+
+}
+
+Point* validObstacle(string obstacleStr) {
+    //counting how many members that separated by "space"
+    int numOfMembers = countMembers(obstacleStr, ',');
+    //if there is less/more parameters than supposed to be
+    if (numOfMembers != 2) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    vector<string> separatedMembers;
+    separatedMembers.resize(numOfMembers);
+    separateString(obstacleStr, separatedMembers, ',');
+    int xGrid = atoi(separatedMembers[0].c_str());
+    int yGrid = atoi(separatedMembers[1].c_str());
+    if (!ifGreaterThan(xGrid,0) && !ifGreaterThan(yGrid,0)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    Point *obs = new Point2D(xGrid, yGrid);
+    return obs;
+}
+
+Grid* createGridAndObstacles() {
+    string xStr, yStr;
+    cin >> xStr;
+    cin >> yStr;
+    if(!ifStringIsNum(xStr) || !ifStringIsNum(yStr)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    int xGrid = atoi(xStr.c_str());
+    int yGrid = atoi(yStr.c_str());
+    if (!ifGreaterThan(xGrid,1) || !ifGreaterThan(yGrid,1)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    //grid is valid, now get the num of obstacles input
+    string numOfObstacles;
+    cin >> numOfObstacles;
+    if(!ifStringIsNum(numOfObstacles)) {
+        cout << "-1" << endl;
+        return NULL;
+    }
+    //num of obstacles is valid, check the points
+    int obstacles = atoi(numOfObstacles.c_str());
+    vector<Point2D> obstaclesVec;
+    for (int i = 0; i < obstacles; ++i) {
+        string newObstacleStr;
+        cin >> newObstacleStr;
+        //counting how many members that separated by "space"
+        int numOfMembers = countMembers(newObstacleStr, ',');
+        //if there is less/more parameters than supposed to be
+        if (numOfMembers != 2) {
+            cout << "-1" << endl;
+            return NULL;
+        }
+        vector<string> separatedMembers;
+        separatedMembers.resize(numOfMembers);
+        separateString(newObstacleStr, separatedMembers, ',');
+        int xPoint = atoi(separatedMembers[0].c_str());
+        int yPoint = atoi(separatedMembers[1].c_str());
+        if ((!ifGreaterThan(xPoint, 0) && !ifGreaterThan(yPoint, 0)) ||
+                (xPoint >= xGrid) || (yPoint >= yGrid)) {
+            cout << "-1" << endl;
+            return NULL;
+        }
+        obstaclesVec.push_back(Point2D(xPoint, yPoint));
+    }
+    //obstacles are valid, now create the map and initialize the obstacles points
+    Grid *map = new TwoDim(xGrid, yGrid);
+    Point* obstaclePoint;
+    for (int i = 0; i < obstacles; i++) {
+        obstaclePoint = new Point2D(obstaclesVec[i]);
+        NodePoint *obstacleNodePoint = map->whereIsTheNode(obstaclePoint);
+        obstacleNodePoint->setVisited();
+        map->pushObstacleToVec(obstacleNodePoint);
+        delete obstaclePoint;
+    }
+    return map;
 }
 
 void createObstacles(Grid* map) {
@@ -139,16 +272,41 @@ void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     tcp->sendData(serial_str2, newClientSd);
 }
 void insertTrip(TaxiCenter* station) {
+    //getting the trip from the console
+    string tripString;
+    cin >> tripString;
+
     int idOfTrip, xStartTrip, yStartTrip, xEndTrip, yEndTrip, numOfPassengerTrip, clockTimeTrip;
     double tariffTrip;
-    char dummy;
+
     Point *source, *destination;
     Point2D p2DStart, p2DEnd;
     Trip newTrip;
-    //getting the trip from the console
-    cin >> idOfTrip >> dummy >> xStartTrip >> dummy >> yStartTrip >> dummy >> xEndTrip >> dummy
-        >> yEndTrip >> dummy >> numOfPassengerTrip >> dummy >> tariffTrip
-        >> dummy >> clockTimeTrip;
+
+    //counting how many members that separated by ','
+    int numOfMembers = countMembers(tripString, ',');
+    if (numOfMembers != 8) {
+        cout << "-1" << endl;
+        return;
+    }
+    vector<string> separatedMembers;
+    separatedMembers.resize(numOfMembers);
+    separateString(tripString, separatedMembers, ',');
+    int isValid = tripInputProcessing(separatedMembers,station->getMapSize());
+    if (isValid == -1) {
+        cout << "-1" << endl;
+        return;
+    }
+
+    //the input is valid
+    idOfTrip = atoi(separatedMembers[0].c_str());
+    xStartTrip = atoi(separatedMembers[1].c_str());
+    yStartTrip = atoi(separatedMembers[2].c_str());
+    xEndTrip = atoi(separatedMembers[3].c_str());
+    yEndTrip = atoi(separatedMembers[4].c_str());
+    numOfPassengerTrip = atoi(separatedMembers[5].c_str());
+    tariffTrip = atof(separatedMembers[6].c_str());
+    clockTimeTrip = atoi(separatedMembers[7].c_str());
     p2DStart = Point2D(xStartTrip, yStartTrip);
     p2DEnd = Point2D(xEndTrip, yEndTrip);
     source = &p2DStart;
@@ -158,15 +316,64 @@ void insertTrip(TaxiCenter* station) {
     //adding the trip to the taxi center
     station->addNewTrip(newTrip);
 }
+
+
+int tripInputProcessing(vector<string> &separatedMembers, Point* mapSize) {
+    //check id
+    int vecSize = separatedMembers.size();
+    for (int i = 0; i < vecSize-2; ++i) {
+        if(!ifStringIsNum(separatedMembers[i].c_str()))
+            return -1;
+    }
+    if (!ifStringIsDouble(separatedMembers[6].c_str())) {
+        return -1;
+    }
+    if(!ifStringIsNum(separatedMembers[7].c_str()))
+        return -1;
+    int id = atoi(separatedMembers[0].c_str());
+    int mapSizeX = ((Point2D*)mapSize)->getX();
+    int mapSizeY = ((Point2D*)mapSize)->getY();
+    int startTripX = atoi(separatedMembers[1].c_str());
+    int startTripY = atoi(separatedMembers[2].c_str());
+    int endTripX = atoi(separatedMembers[3].c_str());
+    int endTripY = atoi(separatedMembers[4].c_str());
+    int numOfPassengers = atoi(separatedMembers[5].c_str());
+    double tarrif = atof(separatedMembers[6].c_str());
+    int time =  atoi(separatedMembers[7].c_str());
+
+    if (!ifGreaterThan(id, 0)) {
+        return -1;
+    }
+    if ((startTripX >= mapSizeX) || (endTripX >= mapSizeX)) {
+        return -1;
+    }
+    if ((startTripY >= mapSizeY) || (endTripY >= mapSizeY)) {
+        return -1;
+    }
+    if ((!ifGreaterThan(startTripX, 0)) || (!ifGreaterThan(endTripX, 0))
+        || (!ifGreaterThan(startTripY, 0)) || (!ifGreaterThan(endTripY, 0))) {
+        return -1;
+    }
+    if (!ifGreaterThan(numOfPassengers, 1)) {
+        return -1;
+    }
+    if (!(tarrif >= 0.0)) {
+        return -1;
+    }
+    if (!ifGreaterThan(time, 1)) {
+        return -1;
+    }
+    return 0;
+}
+
+
+
 void insertCab(TaxiCenter* station) {
     string cabString;
     cin >> cabString;
-
     int idOfCab, typeOfCab;
-    char manufacturerOfCab, colorOfCab, dummy;
+    char manufacturerOfCab, colorOfCab;
     CabFactory* newCab;
-    //getting the cab from console
-    //create vector -> resize ->
     //counting how many members that separated by ','
     int numOfMembers = countMembers(cabString, ',');
     //if there is less/more parameters than supposed to be
@@ -264,6 +471,7 @@ void menu(TaxiCenter* station, Socket* tcp) {
                     }
                 }
             default:
+                cout << "-1" << endl;
                 break;
         }
     }

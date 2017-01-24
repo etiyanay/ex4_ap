@@ -125,6 +125,7 @@ public:
      * @return trip's index we are giving up on
      */
     int tripsPriority(int currentDriverIndex, int lastDriverIndex);
+    Point* getMapSize();
 };
 /**
  * the struct that contains the info we are sending to the threads that calculate the trips paths

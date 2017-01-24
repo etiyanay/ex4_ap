@@ -12,15 +12,11 @@ int main(int argc, char* argv[]) {
     Socket* tcp = new Tcp(1, atoi(argv[1]));
     tcp->initialize();
     //initialize taxi center
-    int xGrid, yGrid;
-    cin >> xGrid >> yGrid;
-    Grid *map = new TwoDim(xGrid, yGrid);
+    Grid *map = createGridAndObstacles();
+    while (NULL == map)
+        map = createGridAndObstacles();
     Bfs currentBfs(map);
     TaxiCenter* station = new TaxiCenter(map, &currentBfs);
-    //push obstacles to vec
-    createObstacles(map, station);
-    //initialize obstacles
-    map->initializeObstaclesInGrid();
     //running menu
     while (1) {
         menu(station, tcp);

@@ -168,3 +168,6 @@ int TaxiCenter::tripsPriority(int currentDriverIndex, int lastDriverIndex) {
     }
     return -2;
 }
+Point* TaxiCenter::getMapSize() {
+    return this->dim->getGridSize();
+}

@@ -25,6 +25,10 @@ int countMembers(string inputOfPoint, char separator);
 int cabInputProcessing(vector<string> &separatedMembers);
 bool ifGreaterThan(int num, int lowerBound);
 bool ifStringIsNum(string str);
+int driverInputProcessing(vector<string> &separatedMembers);
+Grid* createGridAndObstacles();
+int gridSizeInputProcessing();
+Point* validObstacle(string obstacleStr);
 
 /**
  * the func operates the menu and is called from the main
@@ -70,6 +74,9 @@ string bufferToString(char* buffer, int bufflen);
  * @return void
  */
 void *manageClient(void* element);
+
+int tripInputProcessing(vector<string> &separatedMembers, Point* mapSize);
+
 /**
  * the struct to sent to a thread
  */
