@@ -7,7 +7,7 @@ set(SOURCE_FILES Grid.cpp Grid.h NodePoint.cpp NodePoint.h Point.cpp Point.h Poi
         TwoDim.h Bfs.cpp Bfs.h InputProcessing.cpp InputProcessing.h Passenger.cpp Passenger.h Trip.cpp Trip.h
         CabFactory.cpp CabFactory.h StandardCab.cpp StandardCab.h
         LuxuryCab.cpp LuxuryCab.h Driver.cpp Driver.h TaxiCenter.cpp TaxiCenter.h
-        Socket.cpp Socket.h Tcp.cpp Tcp.h Clock.cpp Clock.h)
+        Socket.cpp Socket.h Tcp.cpp Tcp.h Clock.cpp Clock.h ThreadPool.cpp ThreadPool.h Job.cpp Job.h)
 
 set(BOOST_ROOT CACHE PATH "/usr/include/boost/")
 find_package(Boost 1.58.0 COMPONENTS serialization system)

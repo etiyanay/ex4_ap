@@ -1,7 +1,7 @@
 #include "TaxiCenter.h"
+#include "ThreadPool.h"
 
 using namespace std;
-vector <pthread_t> tripsThreads;
 
 TaxiCenter::TaxiCenter(Grid* dim, Bfs* currentBfs){
     this->dim = dim;
@@ -51,32 +51,25 @@ Point* TaxiCenter::findDriverLocationById(int id) {
     }
     return NULL;
 }
-void TaxiCenter::addNewTrip(Trip newTrip) {
+void TaxiCenter::addNewTrip(Trip newTrip, ThreadPool *pool) {
     this->trips.push_back(newTrip);
     TripData *data = new TripData();
     int size = this->trips.size();
     data->trip = &(this->trips[size - 1]);
     data->bfs = this->currentBfs;
-    //resize threads vec
-    tripsThreads.resize(tripsThreads.size() + 1);
-    this->threadFlagIfJoin.push_back(false);
     //create new thread that runs the calculatePath func
-    int status = pthread_create(&(tripsThreads[tripsThreads.size() - 1]), NULL, Bfs::calculatePath,
-                                (void *) data);
-    if (status)
-        exit(0);
+    Job* job = new Job(Bfs::calculatePath, (void*) data);
+    pool->addJob(job);
     //waiting for threads to finish calculating and setting the new trip
-    for (int i = 0; i < tripsThreads.size(); ++i) {
-        if (threadFlagIfJoin[i] == false) {
-            pthread_join(tripsThreads[i], NULL);
-            threadFlagIfJoin[i] = true;
+    for (int i = 0; i < this->trips.size(); ++i) {
+        while (!this->trips[i].getPathInit()) {
+            sleep(1);
         }
     }
     int numOfDeletedTrips = 0;
     int tripsSize = this->trips.size();
     for (int i = 0; i < tripsSize; ++i) {
         if (NULL == this->trips[i-numOfDeletedTrips].getPath()[0]) {
-            cout << "path is unreachable in ADDNEWTRIP" << endl;
             this->trips.erase(this->trips.begin() + i-numOfDeletedTrips);
             numOfDeletedTrips++;
         }

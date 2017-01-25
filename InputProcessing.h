@@ -9,6 +9,7 @@
 #include "Bfs.h"
 #include "TaxiCenter.h"
 #include "Socket.h"
+#include "ThreadPool.h"
 
 //this header declares about the helping funcs in the main- that process the inputs and the menu
 /**
@@ -45,7 +46,7 @@ void insertDriver(TaxiCenter* station, Socket* udp, int newClientSd);
  * the func calls the method "addNewTrip" from the TaxiCenter Classs
  * @param station the taxi center
  */
-void insertTrip(TaxiCenter* station);
+void insertTrip(TaxiCenter* station, ThreadPool *pool);
 /**
  * the func calls the method "addNewCab" from the TaxiCenter Classs
  * @param station the taxi center

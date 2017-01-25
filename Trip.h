@@ -34,6 +34,7 @@ private:
     int id, metersPassed, numOfPassengers, clockTimeTrip;
     Point *startPoint, *endPoint;
     double tariff;
+    bool pathInit;
     vector <NodePoint*> path;
     vector <Passenger*> currentPassengers;
     friend class boost::serialization::access;
@@ -49,6 +50,7 @@ private:
         ar & tariff;
         ar & path;
         ar & currentPassengers;
+        ar & pathInit;
     }
 public:
     /**
@@ -125,5 +127,7 @@ public:
      * the func delete the trip info in the client
      */
     void deleteTripInClient();
+    bool getPathInit();
+    void setPathInit(bool flag);
 };
 #endif //AP_EX1_TRIP_H

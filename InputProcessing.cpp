@@ -6,6 +6,7 @@
 #include "StandardCab.h"
 #include "LuxuryCab.h"
 #include "InputProcessing.h"
+#include "ThreadPool.h"
 #include <boost/serialization/export.hpp>
 
 using namespace std;
@@ -20,6 +21,8 @@ int threadsFinish = 0;
 bool mutexInit = false;
 int numOfDrivers =0;
 int ifAllSocketsClosed = 0;
+bool ifInitThreadPool = false;
+ThreadPool *pool;
 
 void separateString(string input, vector<string> &separatedStrings, char separator) {
     int index = 0, found;
@@ -271,7 +274,7 @@ void insertDriver(TaxiCenter* station, Socket* tcp, int newClientSd) {
     //sending the serialized cab to the client
     tcp->sendData(serial_str2, newClientSd);
 }
-void insertTrip(TaxiCenter* station) {
+void insertTrip(TaxiCenter* station, ThreadPool *pool) {
     //getting the trip from the console
     string tripString;
     cin >> tripString;
@@ -313,7 +316,7 @@ void insertTrip(TaxiCenter* station) {
     //creating new trip
     newTrip = Trip(idOfTrip, source, destination, numOfPassengerTrip, tariffTrip, clockTimeTrip);
     //adding the trip to the taxi center
-    station->addNewTrip(newTrip);
+    station->addNewTrip(newTrip, pool);
 }
 
 
@@ -475,7 +478,11 @@ void menu(TaxiCenter* station, Socket* tcp) {
                 }
                 break;
             case 2:
-                insertTrip(station);
+                if (!ifInitThreadPool) {
+                    pool = new ThreadPool(5);
+                    ifInitThreadPool = true;
+                }
+                insertTrip(station, pool);
                 break;
             case 3:
                 insertCab(station);

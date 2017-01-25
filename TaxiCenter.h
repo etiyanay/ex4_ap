@@ -6,6 +6,7 @@
 #include "Grid.h"
 #include "Bfs.h"
 #include "Socket.h"
+#include "ThreadPool.h"
 
 using namespace std;
 /**
@@ -71,7 +72,7 @@ public:
     /**
      * @param newTrip is the new trip to add to the taxi center
      */
-    void addNewTrip(Trip newTrip);
+    void addNewTrip(Trip newTrip, ThreadPool *pool);
     /**
      * @return the num of trips in the taxi center
      */

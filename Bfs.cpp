@@ -43,14 +43,12 @@ NodePoint* Bfs::bfsAlgorithm(Point* startPoint, Point* destination) {
             }
         }
     }
-    cout << "path is unreachable" << endl;
    return NULL;
 }
 vector<NodePoint*> Bfs::runBfs(Point* startPoint, Point* destination) {
     vector<NodePoint*> path;
     NodePoint* destinationP = this->bfsAlgorithm(startPoint, destination);
     if (NULL == destinationP) {
-        cout << "path is unreachable in RUNBFS" << endl;
         path.push_back(NULL);
         return path;
     }
@@ -74,8 +72,8 @@ void* Bfs::calculatePath(void *element) {
     TripData* data = (TripData*)element;
     Point *start = data->trip->getStartPoint();
     Point *end = data->trip->getEndPoint();
-
     data->trip->setPath(data->bfs->runBfs(start,end));
+    data->trip->setPathInit(true);
     data->bfs->currentGrid->initializeGrid();
     //mutex unlock
     pthread_mutex_unlock(&myMutex);

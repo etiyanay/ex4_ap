@@ -10,6 +10,7 @@ Trip::Trip(int id, Point* source, Point* destination, int numOfPassengers,
     this->tariff = tariff;
     this->numOfPassengers = numOfPassengers;
     this->clockTimeTrip = clockTimeTrip;
+    this->pathInit = false;
 }
 Trip::Trip(int currentId, Point* source, Point* destination, double tariff,
            vector <Passenger*> currentPassengers) {
@@ -64,4 +65,10 @@ void Trip::deleteTripInClient() {
     for (int i = 0; i < sizeOfTrip; ++i) {
         delete path[i];
     }
+}
+bool Trip::getPathInit() {
+    return this->pathInit;
+}
+void Trip::setPathInit(bool flag) {
+    this->pathInit = flag;
 }
